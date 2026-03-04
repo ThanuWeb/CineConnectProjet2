@@ -2,9 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 
 const API_KEY = "bbea3217";
 
-const fetchFilms = async (search = "batman") => {
+import { useQuery } from "@tanstack/react-query";
+
+import { useQuery } from "@tanstack/react-query";
+
+const API_KEY = "bbea3217";
+
+const fetchFilm = async (id) => {
   const response = await fetch(
-    `https://www.omdbapi.com/?apikey=${API_KEY}&s=${search}&type=movie`
+    `https://www.omdbapi.com/?apikey=${API_KEY}&i=${id}`
   );
 
   const data = await response.json();
@@ -16,10 +22,11 @@ const fetchFilms = async (search = "batman") => {
   return data;
 };
 
-export const useFilms = (search) => {
+export const useFilm = (id) => {
   return useQuery({
-    queryKey: ["films", search],
-    queryFn: () => fetchFilms(search),
-    staleTime: 1000 * 60 * 5,
+    queryKey: ["film", id],
+    queryFn: () => fetchFilm(id),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 10,
   });
 };

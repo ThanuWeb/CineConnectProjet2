@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import { useFilms } from "../hooks/useFilms";
+import { Link } from "react-router-dom";
 
 const DEFAULT_SEARCH = "movie";
 
@@ -16,7 +17,6 @@ const Film = () => {
       <div style={{ padding: "20px" }}>
         <h2>Films 🎬</h2>
 
-        {/* recherche simple */}
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -45,14 +45,18 @@ const Film = () => {
 
         <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
           {data?.Search?.map((movie) => (
-            <div key={movie.imdbID}>
+            <Link
+              key={movie.imdbID}
+              to={`/film/${movie.imdbID}`}
+              style={{ textDecoration: "none" }}
+            >
               <img
                 src={movie.Poster !== "N/A" ? movie.Poster : ""}
                 alt={movie.Title}
                 width="150"
                 style={{ borderRadius: "10px" }}
               />
-            </div>
+            </Link>
           ))}
         </div>
       </div>
