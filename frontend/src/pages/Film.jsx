@@ -1,62 +1,67 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
+import React, { useState } from "react";
+import Navbar from "../components/Navbar";
+import { useFilms } from "../hooks/useFilms";
+import { Link } from "react-router-dom";
 
-const API_KEY = 'bbea3217'
-const DEFAULT_SEARCH = 'movie' // mot-clé par défaut
+const DEFAULT_SEARCH = "movie";
 
 const Film = () => {
-  const [movies, setMovies] = useState([])
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState(DEFAULT_SEARCH);
 
-  const fetchMovies = async (searchTerm) => {
-    try {
-      const response = await fetch(
-        `https://www.omdbapi.com/?apikey=${API_KEY}&s=${searchTerm}&type=movie`
-      )
-      const data = await response.json()
-
-      if (data.Response === 'True') {
-        setMovies(data.Search)
-      } else {
-        setError(data.Error)
-      }
-    } catch (err) {
-      setError('Erreur lors du chargement')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // 🔥 chargement automatique
-  useEffect(() => {
-    fetchMovies(DEFAULT_SEARCH)
-  }, [])
+  const { data, isLoading, error } = useFilms(search);
 
   return (
     <>
       <Navbar />
 
-      <div style={{ padding: '20px' }}>
-        <h2>Films par défaut 🎬</h2>
+      <div style={{ padding: "20px" }}>
+        <h2>Films 🎬</h2>
 
-        {loading && <p>Chargement...</p>}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Rechercher un film..."
+          style={{
+            width: "350px",
+            padding: "10px 14px",
+            borderRadius: "999px",
+            border: "1px solid #ccc",
+            margin: "14px 0 20px",
+            outline: "none",
+          }}
+        />
 
-        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-          {movies.map((movie) => (
-            <div key={movie.imdbID}>
+        {isLoading && <p>Chargement...</p>}
+
+        {error && (
+          <p style={{ color: "red" }}>
+            Erreur : {error.message}
+          </p>
+        )}
+
+        {!isLoading && !error && data?.Search?.length === 0 && (
+          <p>Aucun résultat</p>
+        )}
+
+        <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+          {data?.Search?.map((movie) => (
+            <Link
+              key={movie.imdbID}
+              to={`/film/${movie.imdbID}`}
+              style={{ textDecoration: "none" }}
+            >
               <img
-                src={movie.Poster !== 'N/A' ? movie.Poster : ''}
+                src={movie.Poster !== "N/A" ? movie.Poster : ""}
                 alt={movie.Title}
                 width="150"
+                style={{ borderRadius: "10px" }}
               />
-            </div>
+            </Link>
           ))}
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Film
+export default Film;
