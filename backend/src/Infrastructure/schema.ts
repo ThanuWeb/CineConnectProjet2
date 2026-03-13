@@ -1,3 +1,4 @@
+import { uuid } from "drizzle-orm/pg-core";
 import {
   pgTable,
   serial,
@@ -13,7 +14,7 @@ import {
 
 // Table users
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   username: varchar("username", { length: 50 }).notNull().unique(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
@@ -27,7 +28,7 @@ export const users = pgTable("users", {
 export const films = pgTable(
   "films",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id").primaryKey().defaultRandom(),
     omdbId: varchar("omdb_id", { length: 50 }),
     title: varchar("title", { length: 255 }).notNull(),
     year: integer("year"),
@@ -46,7 +47,7 @@ export const films = pgTable(
 
 // Table categories
 export const categories = pgTable("categories", {
-  id: serial("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 100 }).notNull().unique(),
   description: text("description"),
 });
@@ -55,10 +56,10 @@ export const categories = pgTable("categories", {
 export const filmsCategories = pgTable(
   "films_categories",
   {
-    filmId: integer("film_id")
+    filmId: uuid("film_id")
       .notNull()
       .references(() => films.id, { onDelete: "cascade" }),
-    categoryId: integer("category_id")
+    categoryId: uuid("category_id")
       .notNull()
       .references(() => categories.id, { onDelete: "cascade" }),
   },
@@ -71,11 +72,11 @@ export const filmsCategories = pgTable(
 export const reviews = pgTable(
   "reviews",
   {
-    id: serial("id").primaryKey(),
-    userId: integer("user_id")
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    filmId: integer("film_id")
+    filmId: uuid("film_id")
       .notNull()
       .references(() => films.id, { onDelete: "cascade" }),
     rating: integer("rating").notNull(),
@@ -93,11 +94,11 @@ export const reviews = pgTable(
 
 // Table friends
 export const friends = pgTable("friends", {
-  id: serial("id").primaryKey(),
-  requesterId: integer("requester_id")
+  id: uuid("id").primaryKey().defaultRandom(),
+  requesterId: uuid("requester_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  addresseeId: integer("addressee_id")
+  addresseeId: uuid("addressee_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   status: varchar("status", { length: 20 }).notNull().default("pending"),
@@ -107,11 +108,11 @@ export const friends = pgTable("friends", {
 
 // Table messages
 export const messages = pgTable("messages", {
-  id: serial("id").primaryKey(),
-  senderId: integer("sender_id")
+  id: uuid("id").primaryKey().defaultRandom(),
+  senderId: uuid("sender_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  receiverId: integer("receiver_id")
+  receiverId: uuid("receiver_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   content: text("content").notNull(),
