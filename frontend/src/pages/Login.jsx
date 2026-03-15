@@ -1,30 +1,71 @@
-import React from 'react'
+import { Link, useNavigate } from "@tanstack/react-router";
+import React, { useState } from "react";
 
 const Login = () => {
+  const [emailValue, setEmailValue] = useState("");
+  const [pwdValue, setPwdValue] = useState("");
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    setMessage("");
+
+    if (emailValue.trim() === "" || pwdValue.trim() === "") {
+      setMessage("Veuillez compléter tous les champs");
+      return;
+    }
+  }
+  const goBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
-    <>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] md:w-[300px] lg:w-[350px]">
-        {/* Container du card */}
-        <span className=" block text-center font-bold text-xl">CineConnect</span>
-        <hr className="my-4" />
-
-        {/* Container Input */}
-        <div className="space-y-4">
-          <div className="flex flex-col">
-            <label htmlFor="username">Votre identifiant</label>
-            <input  type="text" id="username" placeholder="Identifiant" className="border p-2 rounded text-black"
-            />
-          </div>
-
-          <div className="flex flex-col">
-            <label htmlFor="password">Votre mot de passe</label>
-            <input type="password" id="password" placeholder="Mot de passe" className="border p-2 rounded"
-            />
-          </div>
+    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+      <div className="w-full max-w-xl bg-white rounded-3xl border border-gray-200 shadow-[0_20px_50px_rgba(0,0,0,0.25)] p-8 sm:p-12">
+        <p className="text-black cursor-pointer mb-4" onClick={goBack}>
+          &gt;&gt; Retour
+        </p>
+        <div className="text-center mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold text-black tracking-tight">
+            CineConnect
+          </h1>
+          <p className="text-gray-500 mt-2 text-sm sm:text-base">
+            Accédez à votre espace personnel
+          </p>
         </div>
+
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <div className="relative">
+            <input type="text" placeholder="Votre identifiant" value={emailValue} onChange={(e) => setEmailValue(e.target.value)} className="w-full border-b-2 border-gray-300 focus:border-black outline-none py-3 text-black bg-transparent transition"
+            />
+          </div>
+
+          <div className="relative">
+            <input type="password" placeholder="Votre mot de passe" value={pwdValue} onChange={(e) => setPwdValue(e.target.value)} className="w-full border-b-2 border-gray-300 focus:border-black outline-none py-3 text-black bg-tran transition"
+            />
+          </div>
+
+          <button type="submit" className="w-full mt-6 bg-black text-white py-3 rounded-xl font-semibold hover:scale-[1.02] active:scale-[0.98] transition duration-200">Se connecter</button>
+
+          <div className="flex justify-between items-center text-black underline">
+            <p>Mot de passe oublié ?</p>
+            <Link to="/signup">
+              <p>Vous n'avez pas de compte ?</p>
+            </Link>
+          </div>
+
+          {message && (
+            <p className="text-red-500 mt-4 text-center">{message}</p>
+          )}
+        </form>
       </div>
-    </>
-  )
-}
+    </div>
+  );
+};
 
 export default Login;
