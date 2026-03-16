@@ -1,76 +1,77 @@
-import React from "react";
-import { useParams, Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import { useParams, Link } from "@tanstack/react-router";
 import { useFilm } from "../hooks/useFilm";
 
-const FilmDetail = () => {
-  const { id } = useParams();
-
+export default function FilmDetail() {
+  const { id } = useParams({ from: "/film/$id" });
   const { data, isLoading, error } = useFilm(id);
 
-  return (
-    <>
-      <Navbar />
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-zinc-400">
+        Chargement…
+      </div>
+    );
+  }
 
-      <div style={{ padding: "20px" }}>
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-red-500">
+        Erreur : {error.message}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-black text-white px-20 py-10">
+      <div className="mt-4 mb-12">
         <Link
-          to="/film"
-          style={{
-            display: "inline-block",
-            padding: "10px 16px",
-            borderRadius: "8px",
-            background: "#111",
-            color: "#fff",
-            textDecoration: "none",
-            marginBottom: "20px",
-          }}
+          to="/"
+          className="
+            inline-flex items-center gap-2
+            px-6 py-2
+            rounded-md
+            bg-zinc-800
+            text-zinc-300
+            text-sm
+            hover:bg-zinc-700
+            transition
+          "
         >
           ← Retour
         </Link>
-
-        {isLoading && <p>Chargement...</p>}
-
-        {error && (
-          <p style={{ color: "red" }}>
-            Erreur : {error.message}
-          </p>
-        )}
-
-        {data && !isLoading && !error && (
-          <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
-            <img
-              src={data.Poster !== "N/A" ? data.Poster : ""}
-              alt={data.Title}
-              width="220"
-              style={{ borderRadius: "12px" }}
-            />
-
-            <div style={{ maxWidth: "650px" }}>
-              <h2>{data.Title}</h2>
-
-              <p style={{ color: "#777" }}>
-                {data.Year} • {data.Runtime} • {data.Genre}
-              </p>
-
-              <p>{data.Plot}</p>
-
-              <p>
-                <strong>Réalisateur :</strong> {data.Director}
-              </p>
-
-              <p>
-                <strong>Acteurs :</strong> {data.Actors}
-              </p>
-
-              <p>
-                <strong>Note IMDb :</strong> ⭐ {data.imdbRating}
-              </p>
-            </div>
-          </div>
-        )}
       </div>
-    </>
-  );
-};
 
-export default FilmDetail;
+      <div className="max-w-4xl mx-auto flex gap-10 items-start">
+        <img
+          src={
+            data.Poster !== "N/A"
+              ? data.Poster
+              : "https://via.placeholder.com/300x450"
+          }
+          alt={data.Title}
+          className="w-48 rounded-lg shadow-lg"
+        />
+
+        <div className="flex-1">
+          <h1 className="text-2xl font-semibold mb-4">
+            {data.Title}
+          </h1>
+
+          <p className="text-sm text-zinc-400 mb-4">
+            {data.Year} • {data.Runtime} • {data.Genre}
+          </p>
+
+          <p className="text-zinc-300 leading-relaxed mb-6">
+            {data.Plot}
+          </p>
+
+          <div className="space-y-2 text-sm text-zinc-400">
+            <p><strong>Réalisateur :</strong> {data.Director}</p>
+            <p><strong>Acteurs :</strong> {data.Actors}</p>
+            <p><strong>IMDb :</strong> ⭐ {data.imdbRating}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
