@@ -1,23 +1,15 @@
 import "dotenv/config";
-import { createApp } from "./app";
-import { testConnection } from "./routes/index";
+import express from "express";
+import { router } from "./routes/router";
+
+const app = express();
 
 const PORT = Number(process.env.PORT) || 3000;
 
-async function startServer() {
-  try {
-    await testConnection();
+app.use(express.json());
 
-    const app = createApp();
+app.use(router);
 
-    app.listen(PORT, () => {
-      console.log(` Backend CineConnect démarré sur http://localhost:${PORT}`);
-      console.log(`Swagger docs: http://localhost:${PORT}/api-docs`);
-    });
-  } catch (error) {
-    console.error("Erreur démarrage serveur:", error);
-    process.exit(1);
-  }
-}
-
-startServer();
+app.listen(PORT, () => {
+  console.log(`Backend CineConnect démarré sur http://localhost:${PORT}`);
+});

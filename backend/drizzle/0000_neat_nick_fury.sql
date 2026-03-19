@@ -1,12 +1,12 @@
 CREATE TABLE "categories" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(100) NOT NULL,
 	"description" text,
 	CONSTRAINT "categories_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE "films" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"omdb_id" varchar(50),
 	"title" varchar(255) NOT NULL,
 	"year" integer,
@@ -19,33 +19,33 @@ CREATE TABLE "films" (
 );
 --> statement-breakpoint
 CREATE TABLE "films_categories" (
-	"film_id" integer NOT NULL,
-	"category_id" integer NOT NULL,
+	"film_id" uuid NOT NULL,
+	"category_id" uuid NOT NULL,
 	CONSTRAINT "films_categories_film_id_category_id_pk" PRIMARY KEY("film_id","category_id")
 );
 --> statement-breakpoint
 CREATE TABLE "friends" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"requester_id" integer NOT NULL,
-	"addressee_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"requester_id" uuid NOT NULL,
+	"addressee_id" uuid NOT NULL,
 	"status" varchar(20) DEFAULT 'pending' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "messages" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"sender_id" integer NOT NULL,
-	"receiver_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"sender_id" uuid NOT NULL,
+	"receiver_id" uuid NOT NULL,
 	"content" text NOT NULL,
 	"sent_at" timestamp DEFAULT now() NOT NULL,
 	"is_read" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "reviews" (
-	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" integer NOT NULL,
-	"film_id" integer NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" uuid NOT NULL,
+	"film_id" uuid NOT NULL,
 	"rating" integer NOT NULL,
 	"comment" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE "reviews" (
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"username" varchar(50) NOT NULL,
 	"email" varchar(255) NOT NULL,
 	"password_hash" text NOT NULL,

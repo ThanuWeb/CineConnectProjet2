@@ -1,6 +1,13 @@
-export const ENV = {
-  PORT: process.env.PORT || "3000",
-  DATABASE_URL: process.env.DATABASE_URL!,
-  FRONTEND_ORIGIN: process.env.FRONTEND_ORIGIN || "http://localhost:5173",
-  JWT_SECRET: process.env.JWT_SECRET || "dev-secret-change-me",
-} as const;
+import { z } from "zod";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const EnvSchema = z.object({
+  PORT: z.coerce.number(),
+  DATABASE_URL: z.string(),
+  FRONTEND_ORIGIN: z.string(),
+  JWT_SECRET: z.string(),
+});
+
+export const env = EnvSchema.parse(process.env);
