@@ -3,6 +3,8 @@ export type User = {
   username: string;
   email: string;
   passwordHash: string;
+  avatarUrl: string | null;
+  bio: string | null;
   createdAt: Date;
   updatedAt: Date;
 };

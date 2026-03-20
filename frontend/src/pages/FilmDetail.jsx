@@ -1,17 +1,15 @@
 import React from "react";
-import { useParams, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { useFilm } from "../hooks/useFilm";
+import { useFilm } from "../hooks/useFilms";
+import { Link, useParams } from "@tanstack/react-router";
 
 const FilmDetail = () => {
-  const { id } = useParams();
-
+  const { id } = useParams({ strict: false });
   const { data, isLoading, error } = useFilm(id);
 
   return (
     <>
       <Navbar />
-
       <div style={{ padding: "20px" }}>
         <Link
           to="/film"
@@ -29,42 +27,32 @@ const FilmDetail = () => {
         </Link>
 
         {isLoading && <p>Chargement...</p>}
+        {error && <p style={{ color: "red" }}>Erreur : {error.message}</p>}
 
-        {error && (
-          <p style={{ color: "red" }}>
-            Erreur : {error.message}
-          </p>
-        )}
-
-        {data && !isLoading && !error && (
-          <div style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
-            <img
-              src={data.Poster !== "N/A" ? data.Poster : ""}
-              alt={data.Title}
-              width="220"
-              style={{ borderRadius: "12px" }}
-            />
-
+        {data && (
+          <div
+            style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}
+          >
+            {data.posterUrl && (
+              <img
+                src={data.posterUrl}
+                alt={data.title}
+                width="220"
+                style={{ borderRadius: "12px" }}
+              />
+            )}
             <div style={{ maxWidth: "650px" }}>
-              <h2>{data.Title}</h2>
-
+              <h2>{data.title}</h2>
               <p style={{ color: "#777" }}>
-                {data.Year} • {data.Runtime} • {data.Genre}
+                {data.year}{" "}
+                {data.runtimeMinutes && `• ${data.runtimeMinutes} min`}
               </p>
-
-              <p>{data.Plot}</p>
-
-              <p>
-                <strong>Réalisateur :</strong> {data.Director}
-              </p>
-
-              <p>
-                <strong>Acteurs :</strong> {data.Actors}
-              </p>
-
-              <p>
-                <strong>Note IMDb :</strong> ⭐ {data.imdbRating}
-              </p>
+              {data.plot && <p>{data.plot}</p>}
+              {data.director && (
+                <p>
+                  <strong>Réalisateur :</strong> {data.director}
+                </p>
+              )}
             </div>
           </div>
         )}

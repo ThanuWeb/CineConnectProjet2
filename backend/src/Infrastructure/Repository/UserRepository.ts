@@ -28,4 +28,21 @@ export class UserRepository {
     const [newUser] = await db.insert(users).values(user).returning();
     return newUser;
   }
+
+  async getAllUsers(): Promise<User[]> {
+    const result = await db.select().from(users);
+    return result;
+  }
+
+  async updateUser(
+    id: string,
+    updates: Partial<Pick<User, "username" | "bio" | "avatarUrl">>,
+  ): Promise<User | null> {
+    const [updated] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, id))
+      .returning();
+    return updated ?? null;
+  }
 }
