@@ -78,7 +78,9 @@ export default function Films() {
   <option value="Romance">Romance</option>
   <option value="Thriller">Thriller</option>
   <option value="Horror">Horreur</option>
-  
+  <option value="Crime">Crime</option>
+  <option value="Animation">Animation</option>
+  <option value="Mystery">Mystère</option>
 </select>
           <input
             type="number"
