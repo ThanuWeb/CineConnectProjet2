@@ -1,6 +1,21 @@
 import { Request, Response } from "express";
 import { MovieRepository } from "../Infrastructure/Repository/MovieRepository";
 
+interface OmdbSearchResult {
+  Response: string;
+  Search?: { Title: string; Year: string; imdbID: string; Poster: string }[];
+}
+
+interface OmdbDetail {
+  imdbID: string;
+  Title: string;
+  Year: string;
+  Director: string;
+  Poster: string;
+  Plot: string;
+  Runtime: string;
+}
+
 const movieRepo = new MovieRepository();
 
 export class MovieController {
@@ -26,6 +41,66 @@ export class MovieController {
       }
       res.status(200).json(movie);
     } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  }
+
+  static async searchMovies(req: Request, res: Response) {
+    try {
+      const { q } = req.query;
+      if (!q || typeof q !== "string") {
+        return res.status(400).json({ error: "Paramètre de recherche requis" });
+      }
+
+      // 1. Chercher dans la DB
+      const localResults = await movieRepo.searchByTitle(q);
+      if (localResults.length > 0) {
+        return res.status(200).json(localResults);
+      }
+
+      // 2. Si rien en DB, chercher sur OMDB
+      const omdbRes = await fetch(
+        `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&s=${encodeURIComponent(q)}`,
+      );
+      const omdbData = (await omdbRes.json()) as OmdbSearchResult;
+
+      if (omdbData.Response === "False") {
+        return res.status(200).json([]);
+      }
+
+      // 3. Récupérer les détails de chaque film et les ajouter en DB
+      const savedMovies = [];
+      for (const item of (omdbData.Search ?? []).slice(0, 5)) {
+        // Vérifier si déjà en DB par omdbId
+        const existing = await movieRepo.getMovieByOmdbId(item.imdbID);
+        if (existing) {
+          savedMovies.push(existing);
+          continue;
+        }
+
+        // Récupérer les détails complets
+        const detailRes = await fetch(
+          `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&i=${item.imdbID}`,
+        );
+        const detail = (await detailRes.json()) as OmdbDetail;
+
+        const runtimeMin = parseInt(detail.Runtime) || null;
+
+        const newMovie = await movieRepo.addMovie({
+          omdbId: detail.imdbID,
+          title: detail.Title,
+          year: parseInt(detail.Year) || null,
+          director: detail.Director !== "N/A" ? detail.Director : null,
+          posterUrl: detail.Poster !== "N/A" ? detail.Poster : null,
+          plot: detail.Plot !== "N/A" ? detail.Plot : null,
+          runtimeMinutes: runtimeMin,
+        });
+        savedMovies.push(newMovie);
+      }
+
+      res.status(200).json(savedMovies);
+    } catch (error) {
+      console.error("Error searching movies:", error);
       res.status(500).json({ error: "Erreur serveur" });
     }
   }
