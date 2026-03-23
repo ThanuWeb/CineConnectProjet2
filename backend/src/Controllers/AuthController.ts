@@ -16,7 +16,13 @@ export class AuthController {
         return res.status(400).json({ error: "Email déjà utilisé" });
       }
       const passwordHash = await bcrypt.hash(password, 10);
-      const newUser = await userRepo.addUser({ username, email, passwordHash });
+      const newUser = await userRepo.addUser({
+        username,
+        email,
+        passwordHash,
+        avatarUrl: null,
+        bio: null,
+      });
       res
         .status(201)
         .json({ message: "Utilisateur créé avec succès", userId: newUser.id });
@@ -53,6 +59,50 @@ export class AuthController {
       res.status(200).json({ token });
     } catch (error) {
       console.error("Error during login:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  }
+
+  static async getAllUsers(req: Request, res: Response) {
+    try {
+      const userRepo = new UserRepository();
+      const users = await userRepo.getAllUsers();
+      res.status(200).json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  }
+
+  static async getMe(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user.userId;
+      const userRepo = new UserRepository();
+      const user = await userRepo.getUserById(userId);
+      if (!user)
+        return res.status(404).json({ error: "Utilisateur non trouvé" });
+      const { passwordHash, ...safeUser } = user;
+      res.status(200).json(safeUser);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  }
+
+  static async updateMe(req: Request, res: Response) {
+    try {
+      const userId = (req as any).user.userId;
+      const { username, bio, avatarUrl } = req.body;
+      const userRepo = new UserRepository();
+      const updated = await userRepo.updateUser(userId, {
+        username,
+        bio,
+        avatarUrl,
+      });
+      if (!updated)
+        return res.status(404).json({ error: "Utilisateur non trouvé" });
+      const { passwordHash, ...safeUser } = updated;
+      res.status(200).json(safeUser);
+    } catch (error) {
       res.status(500).json({ error: "Erreur serveur" });
     }
   }
