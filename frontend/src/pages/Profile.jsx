@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 
 export default function Profile() {
+  const [isFriend, setIsFriend] = useState(false);
+
   return (
     <div className="min-h-screen bg-black text-white px-20 py-10">
       <div className="max-w-5xl mx-auto">
@@ -14,9 +17,10 @@ export default function Profile() {
         <h1 className="text-3xl font-bold mb-8">Profil utilisateur</h1>
 
         <div className="grid grid-cols-[220px_1fr] gap-10">
+            
           <div className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800 shadow-lg">
             <div className="w-28 h-28 rounded-full bg-zinc-700 mx-auto mb-4 flex items-center justify-center text-3xl font-bold">
-              A
+              
             </div>
 
             <h2 className="text-xl font-semibold text-center">Alice</h2>
@@ -24,8 +28,15 @@ export default function Profile() {
               alice@email.com
             </p>
 
-            <button className="w-full mt-6 bg-white text-black py-2 rounded-lg font-medium hover:opacity-90 transition">
-              Ajouter en ami
+            <button
+              onClick={() => setIsFriend(true)}
+              className={`w-full mt-6 py-2 rounded-lg font-medium transition ${
+                isFriend
+                  ? "bg-green-500 text-white"
+                  : "bg-white text-black hover:opacity-90"
+              }`}
+            >
+              {isFriend ? "Demande envoyée ✔" : "Ajouter en ami"}
             </button>
           </div>
 

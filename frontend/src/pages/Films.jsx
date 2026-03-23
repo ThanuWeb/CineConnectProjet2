@@ -97,8 +97,7 @@ export default function Films() {
             <option value="Mystery">Mystère</option>
           </select>
 
-          <input
-            type="number"
+          <input type="number"
             placeholder="Année"
             value={year}
             onChange={(e) => setYear(e.target.value)}
