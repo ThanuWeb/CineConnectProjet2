@@ -1,30 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "../api";
 
-const API_KEY = "bbea3217";
+const fetchMovies = async () => {
+  return apiFetch("/movies");
+};
 
-import { useQuery } from "@tanstack/react-query";
-
-import { useQuery } from "@tanstack/react-query";
-
-const API_KEY = "bbea3217";
+export const useFilms = () => {
+  return useQuery({
+    queryKey: ["movies"],
+    queryFn: fetchMovies,
+    staleTime: 1000 * 60 * 10,
+  });
+};
 
 const fetchFilm = async (id) => {
-  const response = await fetch(
-    `https://www.omdbapi.com/?apikey=${API_KEY}&i=${id}`
-  );
-
-  const data = await response.json();
-
-  if (data.Response === "False") {
-    throw new Error(data.Error);
-  }
-
-  return data;
+  return apiFetch(`/movies/${id}`);
 };
 
 export const useFilm = (id) => {
   return useQuery({
-    queryKey: ["film", id],
+    queryKey: ["movie", id],
     queryFn: () => fetchFilm(id),
     enabled: !!id,
     staleTime: 1000 * 60 * 10,
