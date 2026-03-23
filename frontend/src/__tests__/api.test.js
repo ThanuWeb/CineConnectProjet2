@@ -1,4 +1,4 @@
-import { getToken, setToken, removeToken, apiFetch } from "../api";
+import { getToken, setTokens, removeTokens, apiFetch } from "../api";
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -31,14 +31,22 @@ describe("Token helpers", () => {
     expect(getToken()).toBeNull();
   });
 
-  it("setToken stocke le token", () => {
-    setToken("my-token");
-    expect(localStorage.setItem).toHaveBeenCalledWith("token", "my-token");
+  it("setTokens stocke les tokens", () => {
+    setTokens("my-access-token", "my-refresh-token");
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      "accessToken",
+      "my-access-token",
+    );
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      "refreshToken",
+      "my-refresh-token",
+    );
   });
 
-  it("removeToken supprime le token", () => {
-    removeToken();
-    expect(localStorage.removeItem).toHaveBeenCalledWith("token");
+  it("removeTokens supprime les tokens", () => {
+    removeTokens();
+    expect(localStorage.removeItem).toHaveBeenCalledWith("accessToken");
+    expect(localStorage.removeItem).toHaveBeenCalledWith("refreshToken");
   });
 });
 
@@ -63,7 +71,7 @@ describe("apiFetch", () => {
   });
 
   it("devrait inclure le token Authorization si présent", async () => {
-    localStorageMock.setItem("token", "my-token");
+    localStorageMock.setItem("accessToken", "my-access-token");
     fetch.mockResolvedValue({
       ok: true,
       json: async () => ({}),
@@ -75,7 +83,7 @@ describe("apiFetch", () => {
       "http://localhost:3000/movies",
       expect.objectContaining({
         headers: expect.objectContaining({
-          Authorization: "Bearer my-token",
+          Authorization: "Bearer my-access-token",
         }),
       }),
     );
@@ -131,5 +139,153 @@ describe("apiFetch", () => {
         body: '{"email":"a@b.com","password":"123"}',
       }),
     );
+  });
+
+  it("devrait refresh et réessayer si 401", async () => {
+    localStorageMock.setItem("accessToken", "expired-token");
+    localStorageMock.setItem("refreshToken", "valid-refresh");
+
+    fetch
+      // 1er appel: /movies → 401
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: async () => ({ error: "Invalid token" }),
+      })
+      // 2e appel: /refresh → 200
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ accessToken: "new-access-token" }),
+      })
+      // 3e appel: /movies retry → 200
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: "refreshed" }),
+      });
+
+    const result = await apiFetch("/movies");
+
+    expect(result).toEqual({ data: "refreshed" });
+    expect(fetch).toHaveBeenCalledTimes(3);
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      "accessToken",
+      "new-access-token",
+    );
+  });
+
+  it("devrait refresh et réessayer si 403", async () => {
+    localStorageMock.setItem("accessToken", "expired-token");
+    localStorageMock.setItem("refreshToken", "valid-refresh");
+
+    fetch
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ error: "Invalid token" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ accessToken: "new-access-token" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: "ok" }),
+      });
+
+    const result = await apiFetch("/movies");
+
+    expect(result).toEqual({ data: "ok" });
+  });
+
+  it("devrait supprimer les tokens si le refresh échoue", async () => {
+    localStorageMock.setItem("accessToken", "expired-token");
+    localStorageMock.setItem("refreshToken", "bad-refresh");
+
+    fetch
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: async () => ({ error: "Invalid token" }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ error: "Refresh token invalide" }),
+      });
+
+    await expect(apiFetch("/movies")).rejects.toThrow("Invalid token");
+    expect(localStorage.removeItem).toHaveBeenCalledWith("accessToken");
+    expect(localStorage.removeItem).toHaveBeenCalledWith("refreshToken");
+  });
+
+  it("devrait throw si le refresh réussit mais le retry échoue", async () => {
+    localStorageMock.setItem("accessToken", "expired-token");
+    localStorageMock.setItem("refreshToken", "valid-refresh");
+
+    fetch
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 401,
+        json: async () => ({ error: "Invalid token" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ accessToken: "new-access-token" }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ error: "Forbidden" }),
+      });
+
+    await expect(apiFetch("/movies")).rejects.toThrow("Forbidden");
+  });
+
+  it("devrait throw si le retry échoue avec body invalide", async () => {
+    localStorageMock.setItem("accessToken", "expired-token");
+    localStorageMock.setItem("refreshToken", "valid-refresh");
+
+    fetch
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ error: "Invalid token" }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ accessToken: "new-access-token" }),
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        json: async () => {
+          throw new Error();
+        },
+      });
+
+    await expect(apiFetch("/movies")).rejects.toThrow("Erreur serveur");
+  });
+
+  it("devrait ne pas tenter de refresh sans token initial", async () => {
+    fetch.mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      json: async () => ({ error: "No token" }),
+    });
+
+    await expect(apiFetch("/movies")).rejects.toThrow("No token");
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("devrait ne pas refresh si pas de refreshToken en storage", async () => {
+    localStorageMock.setItem("accessToken", "expired-token");
+    // pas de refreshToken
+
+    fetch.mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      json: async () => ({ error: "Invalid token" }),
+    });
+
+    await expect(apiFetch("/movies")).rejects.toThrow("Invalid token");
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 });

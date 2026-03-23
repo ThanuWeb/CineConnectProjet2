@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import React, { useState } from "react";
-import { apiFetch, setToken } from "../api";
+import { useState } from "react";
+import { apiFetch, setTokens } from "../api";
 
 const Login = () => {
   const [emailValue, setEmailValue] = useState("");
@@ -22,7 +22,7 @@ const Login = () => {
         method: "POST",
         body: JSON.stringify({ email: emailValue, password: pwdValue }),
       });
-      setToken(data.token);
+      setTokens(data.accessToken, data.refreshToken);
       navigate({ to: "/film" });
     } catch (err) {
       setMessage(err.message);

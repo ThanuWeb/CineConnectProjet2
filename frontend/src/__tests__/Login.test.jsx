@@ -1,10 +1,10 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 // Mock api
 jest.mock("../api", () => ({
   apiFetch: jest.fn(),
-  setToken: jest.fn(),
+  setTokens: jest.fn(),
   getToken: jest.fn(),
 }));
 
@@ -20,7 +20,7 @@ jest.mock("@tanstack/react-router", () => ({
 }));
 
 import Login from "../pages/Login";
-import { apiFetch, setToken } from "../api";
+import { apiFetch, setTokens } from "../api";
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -49,7 +49,10 @@ describe("Login", () => {
   });
 
   it("devrait appeler apiFetch et naviguer vers /film après login réussi", async () => {
-    apiFetch.mockResolvedValue({ token: "jwt-token-123" });
+    apiFetch.mockResolvedValue({
+      accessToken: "jwt-token-123",
+      refreshToken: "jwt-refresh-token-123",
+    });
 
     render(<Login />);
 
@@ -68,7 +71,10 @@ describe("Login", () => {
         method: "POST",
         body: JSON.stringify({ email: "john@test.com", password: "secret123" }),
       });
-      expect(setToken).toHaveBeenCalledWith("jwt-token-123");
+      expect(setTokens).toHaveBeenCalledWith(
+        "jwt-token-123",
+        "jwt-refresh-token-123",
+      );
       expect(mockNavigate).toHaveBeenCalledWith({ to: "/film" });
     });
   });
