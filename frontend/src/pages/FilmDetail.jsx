@@ -12,19 +12,21 @@ const FilmDetail = () => {
       <Navbar />
       <div style={{ padding: "20px" }}>
         <Link
-          to="/film"
-          style={{
-            display: "inline-block",
-            padding: "10px 16px",
-            borderRadius: "8px",
-            background: "#111",
-            color: "#fff",
-            textDecoration: "none",
-            marginBottom: "20px",
-          }}
+          to="/"
+          className="
+            inline-flex items-center gap-2
+            px-6 py-2
+            rounded-md
+            bg-zinc-800
+            text-zinc-300
+            text-sm
+            hover:bg-zinc-700
+            transition
+          "
         >
           ← Retour
         </Link>
+      </div>
 
         {isLoading && <p>Chargement...</p>}
         {error && <p style={{ color: "red" }}>Erreur : {error.message}</p>}
@@ -55,9 +57,9 @@ const FilmDetail = () => {
               )}
             </div>
           </div>
-        )}
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 
