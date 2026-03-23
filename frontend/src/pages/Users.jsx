@@ -40,7 +40,6 @@ export default function Users() {
   return (
     <div className="min-h-screen bg-black text-white px-10 py-8">
       <div className="max-w-6xl mx-auto">
-        {/* Retour */}
         <Link
           to="/"
           className="inline-block mb-6 px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700 transition"
@@ -48,7 +47,6 @@ export default function Users() {
           ← Retour aux films
         </Link>
 
-        {/* Titre */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Utilisateurs</h1>
           <p className="text-zinc-400">
@@ -56,7 +54,6 @@ export default function Users() {
           </p>
         </div>
 
-        {/* Barre de recherche */}
         <div className="mb-8">
           <input
             type="text"
@@ -67,7 +64,6 @@ export default function Users() {
           />
         </div>
 
-        {/* Liste utilisateurs */}
         <div className="grid grid-cols-2 gap-6">
           {filteredUsers.map((user) => (
             <div
@@ -84,9 +80,12 @@ export default function Users() {
                   <p className="text-zinc-400 mt-2">{user.bio}</p>
 
                   <div className="flex gap-3 mt-5">
-                    <button className="bg-white text-black px-4 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                    <Link
+                      to="/profil"
+                      className="bg-white text-black px-4 py-2 rounded-lg font-medium hover:opacity-90 transition"
+                    >
                       Voir profil
-                    </button>
+                    </Link>
 
                     <Link
                       to="/discussion"
@@ -101,11 +100,8 @@ export default function Users() {
           ))}
         </div>
 
-        {/* Aucun résultat */}
         {filteredUsers.length === 0 && (
-          <p className="text-zinc-400 mt-8">
-            Aucun utilisateur trouvé.
-          </p>
+          <p className="text-zinc-400 mt-8">Aucun utilisateur trouvé.</p>
         )}
       </div>
     </div>

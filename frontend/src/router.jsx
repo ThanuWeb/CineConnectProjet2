@@ -8,6 +8,7 @@ import Films from "./pages/Films";
 import FilmDetail from "./pages/FilmDetail";
 import Discussion from "./pages/Discussion";
 import Users from "./pages/Users";
+import Profile from "./pages/Profile";
 
 const rootRoute = createRootRoute();
 
@@ -35,11 +36,18 @@ const usersRoute = createRoute({
   component: Users,
 });
 
+const profileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/profil",
+  component: Profile,
+});
+
 const routeTree = rootRoute.addChildren([
   filmsRoute,
   filmDetailRoute,
   discussionRoute,
   usersRoute,
+  profileRoute,
 ]);
 
 export const router = createRouter({
