@@ -45,22 +45,38 @@ export default function Films() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* NAVBAR */}
       <nav className="flex justify-between items-center px-20 py-6">
         <h1 className="text-2xl font-bold">cineconnect</h1>
 
-        <div className="flex gap-10 text-zinc-300">
-          <span>Séries</span>
-          <span className="text-white">Films</span>
-          <span>Documentaires</span>
-          <span>FAQ</span>
-          <span>Aide</span>
+        <div className="flex gap-8 text-zinc-300 items-center">
+  <span>Séries</span>
+  <span className="text-white">Films</span>
+  <span>Documentaires</span>
+  <span>FAQ</span>
+  <span>Aide</span>
 
-          <Link to="/discussion" className="hover:text-white transition">
-            Discussion
-          </Link>
+  <Link to="/users" className="hover:text-white transition">
+    Utilisateurs
+  </Link>
+
+  <Link to="/discussion" className="hover:text-white transition">
+    Discussion
+  </Link>
+</div>
+        <div className="flex gap-3">
+          <button className="bg-zinc-800 px-4 py-2 rounded">
+            S’identifier
+          </button>
+          <button className="bg-white text-black px-4 py-2 rounded">
+            S’inscrire
+          </button>
         </div>
+      </nav>
 
-        <div className="flex items-center gap-3">
+      {/* FILTRES CENTRÉS */}
+      <div className="flex justify-center mb-10">
+        <div className="flex flex-wrap gap-4 bg-zinc-900 border border-zinc-800 rounded-2xl px-6 py-4">
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -104,23 +120,14 @@ export default function Films() {
             onChange={(e) => setDirector(e.target.value)}
             className="bg-zinc-800 text-white px-3 py-2 rounded border border-zinc-600 w-32"
           />
-
-          <button className="bg-zinc-800 px-4 py-2 rounded">
-            S’identifier
-          </button>
-
-          <button className="bg-white text-black px-4 py-2 rounded">
-            S’inscrire
-          </button>
         </div>
-      </nav>
+      </div>
 
-      <section className="mt-20 mb-16 text-center">
-        <h2 className="text-3xl font-semibold mb-4">
+      {/* HERO */}
+      <section className="mt-10 mb-16 text-center">
+        <h2 className="text-3xl font-semibold mb-6 leading-relaxed max-w-3xl mx-auto">
           Regardez, chattez et profitez avec vos amis en temps réel même à distance
-        </h2>
-
-        <h2 className="text-3xl font-semibold mb-4">
+          <br />
           temps réel même à distance
         </h2>
 
@@ -135,6 +142,7 @@ export default function Films() {
         </div>
       </section>
 
+      {/* FILMS */}
       <section className="px-20 pb-24">
         <h3 className="text-xl font-semibold mb-10">Films</h3>
 

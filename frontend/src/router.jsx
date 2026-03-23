@@ -7,11 +7,10 @@ import {
 import Films from "./pages/Films";
 import FilmDetail from "./pages/FilmDetail";
 import Discussion from "./pages/Discussion";
+import Users from "./pages/Users";
 
-// IMPORTANT : root en premier
 const rootRoute = createRootRoute();
 
-// Routes
 const filmsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
@@ -30,11 +29,17 @@ const discussionRoute = createRoute({
   component: Discussion,
 });
 
-// Tree
+const usersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/users",
+  component: Users,
+});
+
 const routeTree = rootRoute.addChildren([
   filmsRoute,
   filmDetailRoute,
-  discussionRoute, // 👈 AJOUT ICI
+  discussionRoute,
+  usersRoute,
 ]);
 
 export const router = createRouter({
