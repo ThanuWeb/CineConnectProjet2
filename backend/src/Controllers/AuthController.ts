@@ -51,14 +51,51 @@ export class AuthController {
           .status(400)
           .json({ error: "Email ou mot de passe incorrect" });
       }
-      const token = jwt.sign(
+      const accessToken = jwt.sign(
         { userId: user.id },
         process.env.JWT_SECRET as string,
-        { expiresIn: "1h" },
+        { expiresIn: "15m" },
       );
-      res.status(200).json({ token });
+      const refreshToken = jwt.sign(
+        { userId: user.id },
+        process.env.JWT_REFRESH_SECRET as string,
+        { expiresIn: "7d" },
+      );
+      res.status(200).json({ accessToken, refreshToken });
     } catch (error) {
       console.error("Error during login:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  }
+
+  static async refresh(req: Request, res: Response) {
+    try {
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
+        return res.status(400).json({ error: "Refresh token requis" });
+      }
+
+      jwt.verify(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET as string,
+        (err: any, decoded: any) => {
+          if (err) {
+            return res
+              .status(403)
+              .json({ error: "Refresh token invalide ou expiré" });
+          }
+
+          const newAccessToken = jwt.sign(
+            { userId: decoded.userId },
+            process.env.JWT_SECRET as string,
+            { expiresIn: "15m" },
+          );
+
+          res.status(200).json({ accessToken: newAccessToken });
+        },
+      );
+    } catch (error) {
+      console.error("Error during refresh:", error);
       res.status(500).json({ error: "Erreur serveur" });
     }
   }

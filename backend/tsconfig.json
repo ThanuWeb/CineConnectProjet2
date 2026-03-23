@@ -12,7 +12,8 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "types": ["node", "drizzle-orm"]
+    "types": ["node", "drizzle-orm", "jest"],
+    "isolatedModules": true
   },
   "ts-node": {
     "esm": true

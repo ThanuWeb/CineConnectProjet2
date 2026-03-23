@@ -15,6 +15,7 @@ router.get("/health", (req, res) => {
 
 router.post("/signup", AuthController.signup);
 router.post("/login", AuthController.login);
+router.post("/refresh", AuthController.refresh);
 
 router.get("/movies", authenticateJWT, MovieController.getAllMovies);
 router.get("/movies/:id", authenticateJWT, MovieController.getMovieById);
