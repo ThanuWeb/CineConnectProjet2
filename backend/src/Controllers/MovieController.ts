@@ -29,4 +29,22 @@ export class MovieController {
       res.status(500).json({ error: "Erreur serveur" });
     }
   }
+
+  static async searchMovies(req: Request, res: Response) {
+    try {
+      const q = req.query.q as string;
+      if (!q || q.length < 2) {
+        return res
+          .status(400)
+          .json({
+            error: "Le paramètre q doit contenir au moins 2 caractères",
+          });
+      }
+      const movies = await movieRepo.searchByTitle(q);
+      res.status(200).json(movies);
+    } catch (error) {
+      console.error("Error searching movies:", error);
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  }
 }

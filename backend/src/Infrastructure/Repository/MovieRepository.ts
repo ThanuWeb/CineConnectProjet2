@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, ilike } from "drizzle-orm";
 import { Movie } from "../../Domain/Movie";
 import { db } from "../drizzle";
 import { films } from "../schema";
@@ -20,9 +20,11 @@ export class MovieRepository {
     return result.length > 0 ? result[0] : null;
   }
 
-  async getMovieByName(title: string): Promise<Movie | null> {
-    const result = await db.select().from(films).where(eq(films.title, title));
-    return result.length > 0 ? result[0] : null;
+  async searchByTitle(title: string): Promise<Movie[]> {
+    return db
+      .select()
+      .from(films)
+      .where(ilike(films.title, `%${title}%`));
   }
 
   // Ajouter un nouveau film
