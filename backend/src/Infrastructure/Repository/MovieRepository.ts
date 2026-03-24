@@ -20,11 +20,29 @@ export class MovieRepository {
     return result.length > 0 ? result[0] : null;
   }
 
+  // Recuperer un film par son titre exact
+  async getMovieByName(title: string): Promise<Movie | null> {
+    const result = await db.select().from(films).where(eq(films.title, title));
+    return result.length > 0 ? result[0] : null;
+  }
+
+  // Rechercher des films par titre partiel (pour la barre de recherche)
   async searchByTitle(title: string): Promise<Movie[]> {
-    return db
+    const result = await db
       .select()
       .from(films)
       .where(ilike(films.title, `%${title}%`));
+    return result;
+  }
+
+  // Recuperer un film par son ID OMDB
+  async getMovieByOmdbId(omdbId: string): Promise<Movie | null> {
+    const result = await db
+      .select()
+      .from(films)
+      .where(eq(films.omdbId, omdbId))
+      .limit(1);
+    return result.length > 0 ? result[0] : null;
   }
 
   // Ajouter un nouveau film
