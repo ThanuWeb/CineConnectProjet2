@@ -62,6 +62,8 @@ router.get(
 );
 router.put("/messages/:id/read", authenticateJWT, MessageController.markAsRead);
 
+router.get("/users", authenticateJWT, AuthController.getAllUsers);
+
 router.get("/me", authenticateJWT, AuthController.getMe);
 router.put("/me", authenticateJWT, AuthController.updateMe);
 

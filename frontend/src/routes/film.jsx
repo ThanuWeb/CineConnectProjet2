@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import Film from "../pages/Film";
+import Films from "../pages/Films";
 export const Route = createFileRoute("/film")({
   validateSearch: (search) => ({
     q: search.q ?? "",
   }),
-  component: Film,
+  component: Films,
 });

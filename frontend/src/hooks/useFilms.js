@@ -25,3 +25,12 @@ export const useFilm = (id) => {
     staleTime: 1000 * 60 * 10,
   });
 };
+
+export const useSearchFilms = (query) => {
+  return useQuery({
+    queryKey: ["movies", "search", query],
+    queryFn: () => apiFetch(`/movies/search?q=${encodeURIComponent(query)}`),
+    enabled: query.length >= 2,
+    staleTime: 1000 * 60 * 5,
+  });
+};
