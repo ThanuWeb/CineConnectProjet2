@@ -51,10 +51,10 @@ const Navbar = () => {
         </div>
 
         <ul className="flex flex-col gap-6 p-6">
-          <Link to="/film"><li className="hover:text-gray-300 cursor-pointer">Films-Series</li></Link>
-          <li className="hover:text-gray-300 cursor-pointer">Documentaires</li>
-          <li className="hover:text-gray-300 cursor-pointer">FAQ</li>
-          <li className="hover:text-gray-300 cursor-pointer">Aides</li>
+          <Link to="/film"><li className="hover:text-gray-300 cursor-pointer">Films</li></Link>
+          <Link to="/documentaries"><li className="hover:text-gray-300 cursor-pointer">Documentaires</li></Link>
+          <Link to="/faq"><li className="hover:text-gray-300 cursor-pointer">FAQ</li></Link>
+          <Link to="/help"><li className="hover:text-gray-300 cursor-pointer">Aides</li></Link>
         </ul>
 
         <div className="flex flex-col gap-3 p-6">
