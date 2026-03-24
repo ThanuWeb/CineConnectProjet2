@@ -1,4 +1,6 @@
+import { createServer } from "http";
 import { app } from "./app";
+import { initWebSocket } from "./websocket";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
 
@@ -10,7 +12,10 @@ app.get("/api-docs.json", (req, res) => {
   res.send(swaggerSpec);
 });
 
-app.listen(PORT, () => {
+const httpServer = createServer(app);
+initWebSocket(httpServer);
+
+httpServer.listen(PORT, () => {
   console.log(`Backend CineConnect démarré sur http://localhost:${PORT}`);
   console.log(
     `Documentation API disponible sur http://localhost:${PORT}/api-docs`,
