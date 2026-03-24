@@ -94,31 +94,53 @@ export class MovieController {
         return res.status(400).json({ error: "Paramètre de recherche requis" });
       }
 
-      const omdbRes = await fetch(
-        `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&s=${encodeURIComponent(q)}`,
-      );
-      const omdbData = (await omdbRes.json()) as OmdbSearchResult;
+      let allOmdbResults: OmdbSearchResult["Search"] = [];
+      let page = 1;
+      let totalResults = 0;
+      const MAX_PAGES = 5; // Limite à 5 pages (50 films max)
 
-      if (omdbData.Response === "True" && omdbData.Search) {
-        for (const item of omdbData.Search.slice(0, 5)) {
-          const existing = await movieRepo.getMovieByOmdbId(item.imdbID);
-          if (existing) continue;
+      while (page <= MAX_PAGES) {
+        const omdbRes = await fetch(
+          `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&s=${encodeURIComponent(q)}&page=${page}`,
+        );
+        const omdbData = (await omdbRes.json()) as OmdbSearchResult & {
+          totalResults?: string;
+        };
 
-          const detailRes = await fetch(
-            `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&i=${item.imdbID}`,
-          );
-          const detail = (await detailRes.json()) as OmdbDetail;
+        if (omdbData.Response !== "True" || !omdbData.Search) break;
 
-          await movieRepo.addMovie({
-            omdbId: detail.imdbID,
-            title: detail.Title,
-            year: parseInt(detail.Year) || null,
-            director: detail.Director !== "N/A" ? detail.Director : null,
-            posterUrl: detail.Poster !== "N/A" ? detail.Poster : null,
-            plot: detail.Plot !== "N/A" ? detail.Plot : null,
-            runtimeMinutes: parseInt(detail.Runtime) || null,
-          });
+        allOmdbResults = allOmdbResults.concat(omdbData.Search);
+
+        if (page === 1 && omdbData.totalResults) {
+          totalResults = parseInt(omdbData.totalResults, 10);
         }
+
+        if (
+          allOmdbResults.length >= totalResults ||
+          omdbData.Search.length < 10
+        )
+          break;
+        page++;
+      }
+
+      for (const item of allOmdbResults) {
+        const existing = await movieRepo.getMovieByOmdbId(item.imdbID);
+        if (existing) continue;
+
+        const detailRes = await fetch(
+          `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&i=${item.imdbID}`,
+        );
+        const detail = (await detailRes.json()) as OmdbDetail;
+
+        await movieRepo.addMovie({
+          omdbId: detail.imdbID,
+          title: detail.Title,
+          year: parseInt(detail.Year) || null,
+          director: detail.Director !== "N/A" ? detail.Director : null,
+          posterUrl: detail.Poster !== "N/A" ? detail.Poster : null,
+          plot: detail.Plot !== "N/A" ? detail.Plot : null,
+          runtimeMinutes: parseInt(detail.Runtime) || null,
+        });
       }
 
       const results = await movieRepo.searchByTitle(q);
