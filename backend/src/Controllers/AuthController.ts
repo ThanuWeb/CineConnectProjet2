@@ -104,7 +104,8 @@ export class AuthController {
     try {
       const userRepo = new UserRepository();
       const users = await userRepo.getAllUsers();
-      res.status(200).json(users);
+      const safeUsers = users.map(({ passwordHash, ...rest }) => rest);
+      res.status(200).json(safeUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
       res.status(500).json({ error: "Erreur serveur" });
