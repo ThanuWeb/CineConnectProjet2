@@ -10,10 +10,10 @@ const Navbar = () => {
         <span className="font-bold text-xl">CineConnect</span>
 
         <ul className="hidden md:flex list-none gap-8 text-white">
-          <Link to="/film"><li>Films-Series</li></Link>
-          <li className="cursor-pointer">Documentaires</li>
-          <li className="cursor-pointer">FAQ</li>
-          <li className="cursor-pointer">Aides</li>
+          <Link to="/film"><li>Films</li></Link>
+          <Link to="/documentaries"><li>Documentaires</li></Link>
+          <Link to="/faq"><li>FAQ</li></Link>
+          <Link to="/help"><li>Aides</li></Link>
         </ul>
 
         <div className="hidden md:flex gap-2">
