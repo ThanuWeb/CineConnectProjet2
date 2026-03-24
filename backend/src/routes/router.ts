@@ -20,6 +20,11 @@ router.post("/refresh", AuthController.refresh);
 router.get("/movies/search", authenticateJWT, MovieController.searchMovies);
 router.get("/movies", authenticateJWT, MovieController.getAllMovies);
 router.get("/movies/:id", authenticateJWT, MovieController.getMovieById);
+router.patch(
+  "/movies/:id/poster",
+  authenticateJWT,
+  MovieController.refreshPoster,
+);
 
 router.get("/categories", CategoryController.getAllCategories);
 router.post("/categories", authenticateJWT, CategoryController.addCategory);
