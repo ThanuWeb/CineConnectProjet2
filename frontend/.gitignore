@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 coverage/
+src/routeTree.gen.ts
 
 # Editor directories and files
 .vscode/*
