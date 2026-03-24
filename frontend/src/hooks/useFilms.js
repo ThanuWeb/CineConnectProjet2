@@ -1,10 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchFilms } from "../api/films";
+import { apiFetch } from "../api";
 
-export function useFilms(search, year) {
+const fetchMovies = async () => {
+  return apiFetch("/movies");
+};
+
+export const useFilms = () => {
   return useQuery({
-    queryKey: ["films", search, year],
-    queryFn: () => fetchFilms(search, year),
-    enabled: !!search,
+    queryKey: ["movies"],
+    queryFn: fetchMovies,
+    staleTime: 1000 * 60 * 10,
   });
-}
+};
+
+const fetchFilm = async (id) => {
+  return apiFetch(`/movies/${id}`);
+};
+
+export const useFilm = (id) => {
+  return useQuery({
+    queryKey: ["movie", id],
+    queryFn: () => fetchFilm(id),
+    enabled: !!id,
+    staleTime: 1000 * 60 * 10,
+  });
+};
