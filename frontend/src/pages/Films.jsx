@@ -4,6 +4,7 @@ import { useFilms, useSearchFilms } from "../hooks/useFilms";
 import { useCategories } from "../hooks/useCategories";
 import FilmCard from "../components/FilmCard";
 import SearchBar from "../components/SearchBar";
+import Navbar from "../components/Navbar";
 
 export default function Films() {
   const [input, setInput] = useState("");
@@ -56,37 +57,7 @@ export default function Films() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* NAVBAR */}
-      <nav className="flex justify-between items-center px-20 py-6">
-        <h1 className="text-2xl font-bold">cineconnect</h1>
-
-        <div className="flex gap-8 text-zinc-300 items-center">
-          <span>Séries</span>
-          <span className="text-white">Films</span>
-          <span>Documentaires</span>
-          <span>FAQ</span>
-          <span>Aide</span>
-
-          <Link to="/users" className="hover:text-white transition">
-            Utilisateurs
-          </Link>
-
-          <Link to="/discussion" className="hover:text-white transition">
-            Discussion
-          </Link>
-        </div>
-        <div className="flex gap-3">
-          <Link to="/login">
-            <button className="bg-zinc-800 px-4 py-2 rounded">
-              S’identifier
-            </button>
-          </Link>
-          <Link to="/signup">
-            <button className="bg-white text-black px-4 py-2 rounded">
-              S’inscrire
-            </button>
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* FILTRES CENTRÉS */}
       <div className="flex justify-center mb-10">
