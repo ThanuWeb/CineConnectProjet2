@@ -1,85 +1,106 @@
-import React from "react";
 import { Link, useParams } from "@tanstack/react-router";
-import Navbar from "../components/Navbar";
-import { useFilm } from "../hooks/useFilms";
+import { useFilm } from "../hooks/useFilm";
+import FavoriteButton from "../components/FavoriteButton";
+import RatingStars from "../components/RatingStars";
+import CommentsSection from "../components/CommentsSection";
 
-const FilmDetail = () => {
+export default function FilmDetail() {
   const { id } = useParams({ from: "/film/$id" });
   const { data, isLoading, error } = useFilm(id);
 
-  return (
-    <>
-      <Navbar />
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        Chargement...
+      </div>
+    );
+  }
 
-      <div className="min-h-screen bg-black text-white px-20 py-10">
-        <div className="mt-4 mb-12">
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-red-500 flex items-center justify-center">
+        {error.message}
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        Aucun film trouvé.
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-black text-white px-8 py-10">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
           <Link
             to="/"
-            className="
-              inline-flex items-center gap-2
-              px-6 py-2
-              rounded-md
-              bg-zinc-800
-              text-zinc-300
-              text-sm
-              hover:bg-zinc-700
-              transition
-            "
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-800 text-zinc-300 text-sm hover:bg-zinc-700 transition"
           >
             ← Retour
           </Link>
         </div>
 
-        {isLoading && (
-          <p className="text-zinc-400">Chargement...</p>
-        )}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-lg p-8">
+          <div className="grid md:grid-cols-[300px_1fr] gap-10 items-start">
+            <div>
+              <img
+                src={
+                  data.Poster && data.Poster !== "N/A"
+                    ? data.Poster
+                    : "https://via.placeholder.com/300x450?text=No+Poster"
+                }
+                alt={data.Title || "Film"}
+                className="w-full max-w-[300px] rounded-xl shadow-lg object-cover"
+              />
+            </div>
 
-        {error && (
-          <p className="text-red-500">Erreur : {error.message}</p>
-        )}
-
-        {data && (
-          <div className="max-w-4xl mx-auto flex gap-10 items-start">
-            <img
-              src={
-                data.Poster !== "N/A"
-                  ? data.Poster
-                  : "https://via.placeholder.com/300x450"
-              }
-              alt={data.Title}
-              className="w-48 rounded-lg shadow-lg"
-            />
-
-            <div className="flex-1">
-              <h1 className="text-2xl font-semibold mb-4">
-                {data.Title}
+            <div>
+              <h1 className="text-4xl font-bold mb-4">
+                {data.Title || "Titre indisponible"}
               </h1>
 
-              <p className="text-sm text-zinc-400 mb-4">
-                {data.Year} • {data.Runtime} • {data.Genre}
+              <p className="text-zinc-400 text-lg mb-6">
+                {data.Year || "Année inconnue"} • {data.Runtime || "Durée inconnue"} •{" "}
+                {data.Genre || "Genre inconnu"}
               </p>
 
-              <p className="text-zinc-300 leading-relaxed mb-6">
-                {data.Plot}
+              <p className="text-zinc-300 leading-relaxed mb-8">
+                {data.Plot || "Aucun résumé disponible."}
               </p>
 
-              <div className="space-y-2 text-sm text-zinc-400">
+              <div className="space-y-3 text-base text-zinc-300 mb-8">
                 <p>
-                  <strong>Réalisateur :</strong> {data.Director}
+                  <strong className="text-white">Réalisateur :</strong>{" "}
+                  {data.Director || "Inconnu"}
                 </p>
                 <p>
-                  <strong>Acteurs :</strong> {data.Actors}
+                  <strong className="text-white">Acteurs :</strong>{" "}
+                  {data.Actors || "Inconnus"}
                 </p>
                 <p>
-                  <strong>IMDb :</strong> ⭐ {data.imdbRating}
+                  <strong className="text-white">IMDb :</strong>{" "}
+                  ⭐ {data.imdbRating || "Non noté"}
                 </p>
+              </div>
+
+              <div className="flex flex-col gap-6">
+                <FavoriteButton imdbID={data.imdbID} />
+
+                <div>
+                  <h3 className="text-lg font-semibold mb-2">Votre note</h3>
+                  <RatingStars imdbID={data.imdbID} />
+                </div>
               </div>
             </div>
           </div>
-        )}
-      </div>
-    </>
-  );
-};
 
-export default FilmDetail;
+          <CommentsSection imdbID={data.imdbID} />
+        </div>
+      </div>
+    </div>
+  );
+}
