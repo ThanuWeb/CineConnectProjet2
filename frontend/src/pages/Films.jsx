@@ -17,7 +17,7 @@ export default function Films() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setSearch(input);
+      setSearch(input.trim() || "batman");
     }, 400);
 
     return () => clearTimeout(timeout);
@@ -45,25 +45,25 @@ export default function Films() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* NAVBAR */}
       <nav className="flex justify-between items-center px-20 py-6">
         <h1 className="text-2xl font-bold">cineconnect</h1>
 
-        <div className="flex gap-8 text-zinc-300 items-center">
-  <span>Séries</span>
-  <span className="text-white">Films</span>
-  <span>Documentaires</span>
-  <span>FAQ</span>
-  <span>Aide</span>
+        <div className="flex gap-10 text-zinc-300 items-center">
+          <span>Séries</span>
+          <span className="text-white">Films</span>
+          <span>Documentaires</span>
+          <span>FAQ</span>
+          <span>Aide</span>
 
-  <Link to="/users" className="hover:text-white transition">
-    Utilisateurs
-  </Link>
+          <Link to="/discussion" className="hover:text-white transition">
+            Discussion
+          </Link>
 
-  <Link to="/discussion" className="hover:text-white transition">
-    Discussion
-  </Link>
-</div>
+          <Link to="/users" className="hover:text-white transition">
+            Utilisateurs
+          </Link>
+        </div>
+
         <div className="flex gap-3">
           <button className="bg-zinc-800 px-4 py-2 rounded">
             S’identifier
@@ -74,7 +74,6 @@ export default function Films() {
         </div>
       </nav>
 
-      {/* FILTRES CENTRÉS */}
       <div className="flex justify-center mb-10">
         <div className="flex flex-wrap gap-4 bg-zinc-900 border border-zinc-800 rounded-2xl px-6 py-4">
           <select
@@ -97,7 +96,8 @@ export default function Films() {
             <option value="Mystery">Mystère</option>
           </select>
 
-          <input type="number"
+          <input
+            type="number"
             placeholder="Année"
             value={year}
             onChange={(e) => setYear(e.target.value)}
@@ -122,7 +122,6 @@ export default function Films() {
         </div>
       </div>
 
-      {/* HERO */}
       <section className="mt-10 mb-16 text-center">
         <h2 className="text-3xl font-semibold mb-6 leading-relaxed max-w-3xl mx-auto">
           Regardez, chattez et profitez avec vos amis en temps réel même à distance
@@ -141,7 +140,6 @@ export default function Films() {
         </div>
       </section>
 
-      {/* FILMS */}
       <section className="px-20 pb-24">
         <h3 className="text-xl font-semibold mb-10">Films</h3>
 
@@ -156,7 +154,7 @@ export default function Films() {
           </div>
         )}
 
-        {!isLoading && !error && filteredFilms.length === 0 && (
+        {!isLoading && !error && data?.Search && filteredFilms.length === 0 && (
           <p className="text-zinc-400">Aucun film trouvé avec ces filtres.</p>
         )}
       </section>
