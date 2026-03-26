@@ -17,8 +17,14 @@ router.post("/signup", AuthController.signup);
 router.post("/login", AuthController.login);
 router.post("/refresh", AuthController.refresh);
 
+router.get("/movies/search", authenticateJWT, MovieController.searchMovies);
 router.get("/movies", authenticateJWT, MovieController.getAllMovies);
 router.get("/movies/:id", authenticateJWT, MovieController.getMovieById);
+router.patch(
+  "/movies/:id/poster",
+  authenticateJWT,
+  MovieController.refreshPoster,
+);
 
 router.get("/categories", CategoryController.getAllCategories);
 router.post("/categories", authenticateJWT, CategoryController.addCategory);
@@ -60,6 +66,8 @@ router.get(
   MessageController.getConversation,
 );
 router.put("/messages/:id/read", authenticateJWT, MessageController.markAsRead);
+
+router.get("/users", authenticateJWT, AuthController.getAllUsers);
 
 router.get("/me", authenticateJWT, AuthController.getMe);
 router.put("/me", authenticateJWT, AuthController.updateMe);

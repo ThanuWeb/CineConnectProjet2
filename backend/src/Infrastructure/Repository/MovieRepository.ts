@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, ilike } from "drizzle-orm";
 import { Movie } from "../../Domain/Movie";
 import { db } from "../drizzle";
 import { films } from "../schema";
@@ -20,8 +20,28 @@ export class MovieRepository {
     return result.length > 0 ? result[0] : null;
   }
 
+  // Recuperer un film par son titre exact
   async getMovieByName(title: string): Promise<Movie | null> {
     const result = await db.select().from(films).where(eq(films.title, title));
+    return result.length > 0 ? result[0] : null;
+  }
+
+  // Rechercher des films par titre partiel (pour la barre de recherche)
+  async searchByTitle(title: string): Promise<Movie[]> {
+    const result = await db
+      .select()
+      .from(films)
+      .where(ilike(films.title, `%${title}%`));
+    return result;
+  }
+
+  // Recuperer un film par son ID OMDB
+  async getMovieByOmdbId(omdbId: string): Promise<Movie | null> {
+    const result = await db
+      .select()
+      .from(films)
+      .where(eq(films.omdbId, omdbId))
+      .limit(1);
     return result.length > 0 ? result[0] : null;
   }
 

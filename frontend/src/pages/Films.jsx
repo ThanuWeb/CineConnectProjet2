@@ -1,19 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { useFilms } from "../hooks/useFilms";
+import { useFilms, useSearchFilms } from "../hooks/useFilms";
 import FilmCard from "../components/FilmCard";
 import SearchBar from "../components/SearchBar";
 
 export default function Films() {
-  const [input, setInput] = useState("batman");
-  const [search, setSearch] = useState("batman");
+  const [input, setInput] = useState("");
+  const [search, setSearch] = useState("");
 
   const [year, setYear] = useState("");
   const [category, setCategory] = useState("");
   const [minRating, setMinRating] = useState("");
   const [director, setDirector] = useState("");
 
-  const { data, isLoading, error } = useFilms(search, year);
+  const { data: allFilms, isLoading: loadingAll, error: errorAll } = useFilms();
+  const {
+    data: searchResults,
+    isLoading: loadingSearch,
+    error: errorSearch,
+  } = useSearchFilms(search);
+  const isSearching = search.length >= 2;
+  const data = isSearching ? (searchResults ?? []) : (allFilms ?? []);
+  const isLoading = isSearching ? loadingSearch : loadingAll;
+  const error = isSearching ? errorSearch : errorAll;
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -24,24 +33,16 @@ export default function Films() {
   }, [input]);
 
   const filteredFilms = useMemo(() => {
-    if (!data?.Search) return [];
+    if (!data || !Array.isArray(data)) return [];
 
-    return data.Search.filter((film) => {
-      const genreMatch = category
-        ? film.Genre?.toLowerCase().includes(category.toLowerCase())
-        : true;
-
+    return data.filter((film) => {
+      const yearMatch = year ? film.year === Number(year) : true;
       const directorMatch = director
-        ? film.Director?.toLowerCase().includes(director.toLowerCase())
+        ? film.director?.toLowerCase().includes(director.toLowerCase())
         : true;
-
-      const ratingMatch = minRating
-        ? Number(film.imdbRating) >= Number(minRating)
-        : true;
-
-      return genreMatch && directorMatch && ratingMatch;
+      return yearMatch && directorMatch;
     });
-  }, [data, category, director, minRating]);
+  }, [data, year, director]);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -65,12 +66,16 @@ export default function Films() {
         </div>
 
         <div className="flex gap-3">
-          <button className="bg-zinc-800 px-4 py-2 rounded">
-            S’identifier
-          </button>
-          <button className="bg-white text-black px-4 py-2 rounded">
-            S’inscrire
-          </button>
+          <Link to="/login">
+            <button className="bg-zinc-800 px-4 py-2 rounded">
+              S’identifier
+            </button>
+          </Link>
+          <Link to="/signup">
+            <button className="bg-white text-black px-4 py-2 rounded">
+              S’inscrire
+            </button>
+          </Link>
         </div>
       </nav>
 
@@ -124,7 +129,8 @@ export default function Films() {
 
       <section className="mt-10 mb-16 text-center">
         <h2 className="text-3xl font-semibold mb-6 leading-relaxed max-w-3xl mx-auto">
-          Regardez, chattez et profitez avec vos amis en temps réel même à distance
+          Regardez, chattez et profitez avec vos amis en temps réel même à
+          distance
           <br />
           temps réel même à distance
         </h2>
@@ -149,7 +155,7 @@ export default function Films() {
         {!isLoading && !error && filteredFilms.length > 0 && (
           <div className="grid grid-cols-5 gap-10">
             {filteredFilms.map((film) => (
-              <FilmCard key={film.imdbID} film={film} />
+              <FilmCard key={film.id} film={film} />
             ))}
           </div>
         )}

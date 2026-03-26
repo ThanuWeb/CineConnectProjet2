@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useParams } from "@tanstack/react-router";
 import Navbar from "../components/Navbar";
-import { useFilm } from "../hooks/useFilm";
+import { useFilm } from "../hooks/useFilms";
 
 const FilmDetail = () => {
   const { id } = useParams({ from: "/film/$id" });
