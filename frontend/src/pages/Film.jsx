@@ -1,62 +1,67 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
-
-const API_KEY = 'bbea3217'
-const DEFAULT_SEARCH = 'movie' // mot-clé par défaut
+import { useState, useEffect } from "react";
+import Navbar from "../components/Navbar";
+import { useFilms } from "../hooks/useFilms";
+import { apiFetch } from "../api";
+import { Link, useSearch } from "@tanstack/react-router";
 
 const Film = () => {
-  const [movies, setMovies] = useState([])
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const { data, isLoading, error } = useFilms();
+  const { q } = useSearch({ strict: false });
+  const [searchResults, setSearchResults] = useState(null);
+  const [searching, setSearching] = useState(false);
 
-  const fetchMovies = async (searchTerm) => {
-    try {
-      const response = await fetch(
-        `https://www.omdbapi.com/?apikey=${API_KEY}&s=${searchTerm}&type=movie`
-      )
-      const data = await response.json()
-
-      if (data.Response === 'True') {
-        setMovies(data.Search)
-      } else {
-        setError(data.Error)
-      }
-    } catch (err) {
-      setError('Erreur lors du chargement')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // 🔥 chargement automatique
   useEffect(() => {
-    fetchMovies(DEFAULT_SEARCH)
-  }, [])
+    if (!q) {
+      setSearchResults(null);
+      return;
+    }
+    setSearching(true);
+    apiFetch(`/movies/search?q=${encodeURIComponent(q)}`)
+      .then((results) => setSearchResults(results))
+      .catch(console.error)
+      .finally(() => setSearching(false));
+  }, [q]);
+
+  const moviesToDisplay = searchResults ?? data;
 
   return (
     <>
       <Navbar />
+      <div style={{ padding: "20px" }}>
+        <h2>{q ? `Résultats pour "${q}"` : "Films"}</h2>
 
-      <div style={{ padding: '20px' }}>
-        <h2>Films par défaut 🎬</h2>
+        {(isLoading || searching) && <p>Chargement...</p>}
+        {error && <p style={{ color: "red" }}>Erreur : {error.message}</p>}
 
-        {loading && <p>Chargement...</p>}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-
-        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-          {movies.map((movie) => (
-            <div key={movie.imdbID}>
-              <img
-                src={movie.Poster !== 'N/A' ? movie.Poster : ''}
-                alt={movie.Title}
-                width="150"
-              />
-            </div>
+        <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+          {moviesToDisplay?.map((movie) => (
+            <Link
+              key={movie.id}
+              to={`/film/${movie.id}`}
+              style={{ textDecoration: "none" }}
+            >
+              <div>
+                {movie.posterUrl && (
+                  <img
+                    src={movie.posterUrl}
+                    alt={movie.title}
+                    width="150"
+                    style={{ borderRadius: "10px" }}
+                  />
+                )}
+                <p style={{ color: "#fff", textAlign: "center" }}>
+                  {movie.title}
+                </p>
+              </div>
+            </Link>
           ))}
+          {searchResults?.length === 0 && (
+            <p style={{ color: "#aaa" }}>Aucun film trouvé</p>
+          )}
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Film
+export default Film;
