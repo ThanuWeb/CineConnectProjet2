@@ -13,7 +13,7 @@ dist-ssr
 *.local
 coverage/
 src/routeTree.gen.ts
-
+.tanstack/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

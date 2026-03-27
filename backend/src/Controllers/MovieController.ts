@@ -1,8 +1,5 @@
 import { Request, Response } from "express";
 import { MovieRepository } from "../Infrastructure/Repository/MovieRepository";
-import { db } from "../Infrastructure/drizzle";
-import { categories, filmsCategories } from "../Infrastructure/schema";
-import { sql } from "drizzle-orm";
 
 interface OmdbSearchResult {
   Response: string;
@@ -17,7 +14,6 @@ interface OmdbDetail {
   Poster: string;
   Plot: string;
   Runtime: string;
-  Genre?: string;
 }
 
 const movieRepo = new MovieRepository();
@@ -26,64 +22,7 @@ export class MovieController {
   static async getAllMovies(req: Request, res: Response) {
     try {
       const movies = await movieRepo.getAllMovies();
-
-      const updated = [];
-      for (const movie of movies) {
-        const needsPoster =
-          !movie.posterUrl || !movie.posterUrl.startsWith("http");
-
-        if (needsPoster && movie.omdbId) {
-          try {
-            const omdbRes = await fetch(
-              `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&i=${movie.omdbId}`,
-            );
-            const detail = (await omdbRes.json()) as OmdbDetail;
-            if (detail.Poster && detail.Poster !== "N/A") {
-              const updatedMovie = await movieRepo.updateMovie(movie.id, {
-                posterUrl: detail.Poster,
-              });
-              updated.push(updatedMovie ?? movie);
-              continue;
-            }
-          } catch {}
-        }
-
-        if (needsPoster && !movie.omdbId) {
-          try {
-            const omdbRes = await fetch(
-              `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&t=${encodeURIComponent(movie.title)}`,
-            );
-            const detail = (await omdbRes.json()) as OmdbDetail;
-            if (detail.Poster && detail.Poster !== "N/A") {
-              const updatedMovie = await movieRepo.updateMovie(movie.id, {
-                posterUrl: detail.Poster,
-                omdbId: detail.imdbID,
-              });
-              updated.push(updatedMovie ?? movie);
-              continue;
-            }
-          } catch {}
-        }
-
-        updated.push(movie);
-      }
-
-      // Ajout des catégories à chaque film
-      const moviesWithCategories = await Promise.all(
-        updated.map(async (movie) => {
-          const filmCategories = await db
-            .select({ id: categories.id, name: categories.name })
-            .from(filmsCategories)
-            .innerJoin(
-              categories,
-              sql`${filmsCategories.categoryId} = ${categories.id}`,
-            )
-            .where(sql`${filmsCategories.filmId} = ${movie.id}`);
-          return { ...movie, categories: filmCategories };
-        }),
-      );
-
-      res.status(200).json(moviesWithCategories);
+      res.status(200).json(movies);
     } catch (error) {
       console.error("Error fetching movies:", error);
       res.status(500).json({ error: "Server error" });
@@ -100,18 +39,7 @@ export class MovieController {
       if (!movie) {
         return res.status(404).json({ error: "Film non trouvé" });
       }
-
-      // Ajout des catégories pour ce film
-      const filmCategories = await db
-        .select({ id: categories.id, name: categories.name })
-        .from(filmsCategories)
-        .innerJoin(
-          categories,
-          sql`${filmsCategories.categoryId} = ${categories.id}`,
-        )
-        .where(sql`${filmsCategories.filmId} = ${movie.id}`);
-
-      res.status(200).json({ ...movie, categories: filmCategories });
+      res.status(200).json(movie);
     } catch (error) {
       res.status(500).json({ error: "Erreur serveur" });
     }
@@ -160,11 +88,9 @@ export class MovieController {
         const detailRes = await fetch(
           `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&i=${item.imdbID}`,
         );
-        const detail = (await detailRes.json()) as OmdbDetail & {
-          Genre?: string;
-        };
+        const detail = (await detailRes.json()) as OmdbDetail;
 
-        const newMovie = await movieRepo.addMovie({
+        await movieRepo.addMovie({
           omdbId: detail.imdbID,
           title: detail.Title,
           year: parseInt(detail.Year) || null,
@@ -173,49 +99,10 @@ export class MovieController {
           plot: detail.Plot !== "N/A" ? detail.Plot : null,
           runtimeMinutes: parseInt(detail.Runtime) || null,
         });
-
-        if (detail.Genre && newMovie?.id) {
-          const genres = detail.Genre.split(",").map((g) => g.trim());
-          for (const genreName of genres) {
-            let [category] = await db
-              .select()
-              .from(categories)
-              .where(sql`LOWER(name) = LOWER(${genreName})`)
-              .limit(1);
-
-            if (!category) {
-              [category] = await db
-                .insert(categories)
-                .values({ name: genreName })
-                .returning();
-            }
-
-            await db
-              .insert(filmsCategories)
-              .values({ filmId: newMovie.id, categoryId: category.id })
-              .onConflictDoNothing();
-          }
-        }
       }
 
       const results = await movieRepo.searchByTitle(q);
-
-      // Ajout des catégories à chaque film trouvé
-      const resultsWithCategories = await Promise.all(
-        results.map(async (movie) => {
-          const filmCategories = await db
-            .select({ id: categories.id, name: categories.name })
-            .from(filmsCategories)
-            .innerJoin(
-              categories,
-              sql`${filmsCategories.categoryId} = ${categories.id}`,
-            )
-            .where(sql`${filmsCategories.filmId} = ${movie.id}`);
-          return { ...movie, categories: filmCategories };
-        }),
-      );
-
-      res.status(200).json(resultsWithCategories);
+      res.status(200).json(results);
     } catch (error) {
       console.error("Error searching movies:", error);
       res.status(500).json({ error: "Erreur serveur" });

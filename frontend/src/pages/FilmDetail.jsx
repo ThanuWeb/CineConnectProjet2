@@ -1,13 +1,14 @@
 import { Link, useParams } from "@tanstack/react-router";
-import { useFilm } from "../hooks/useFilm";
+import { useFilms } from "../hooks/useFilms";
 import FavoriteButton from "../components/FavoriteButton";
 import RatingStars from "../components/RatingStars";
 import CommentsSection from "../components/CommentsSection";
 
 export default function FilmDetail() {
   const { id } = useParams({ from: "/film/$id" });
-  const { data, isLoading, error } = useFilm(id);
+  const { data, isLoading, error } = useFilms(id);
 
+  console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZ");
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -49,41 +50,42 @@ export default function FilmDetail() {
             <div>
               <img
                 src={
-                  data.Poster && data.Poster !== "N/A"
-                    ? data.Poster
+                  data.posterUrl && data.posterUrl !== "N/A"
+                    ? data.posterUrl
                     : "https://via.placeholder.com/300x450?text=No+Poster"
                 }
-                alt={data.Title || "Film"}
+                alt={data.title || "Film"}
                 className="w-full max-w-[300px] rounded-xl shadow-lg object-cover"
               />
             </div>
 
             <div>
               <h1 className="text-4xl font-bold mb-4">
-                {data.Title || "Titre indisponible"}
+                {data.title || "Titre indisponible"}
               </h1>
 
               <p className="text-zinc-400 text-lg mb-6">
-                {data.Year || "Année inconnue"} • {data.Runtime || "Durée inconnue"} •{" "}
-                {data.Genre || "Genre inconnu"}
+                {data.year || "Année inconnue"} •{" "}
+                {data.runtimeMinutes || "Durée inconnue"} •{" "}
+                {data.genre || "Genre inconnu"}
               </p>
 
               <p className="text-zinc-300 leading-relaxed mb-8">
-                {data.Plot || "Aucun résumé disponible."}
+                {data.plot || "Aucun résumé disponible."}
               </p>
 
               <div className="space-y-3 text-base text-zinc-300 mb-8">
                 <p>
                   <strong className="text-white">Réalisateur :</strong>{" "}
-                  {data.Director || "Inconnu"}
+                  {data.director || "Inconnu"}
                 </p>
                 <p>
                   <strong className="text-white">Acteurs :</strong>{" "}
-                  {data.Actors || "Inconnus"}
+                  {data.actors || "Inconnus"}
                 </p>
                 <p>
-                  <strong className="text-white">IMDb :</strong>{" "}
-                  ⭐ {data.imdbRating || "Non noté"}
+                  <strong className="text-white">IMDb :</strong> ⭐{" "}
+                  {data.imdbRating || "Non noté"}
                 </p>
               </div>
 
