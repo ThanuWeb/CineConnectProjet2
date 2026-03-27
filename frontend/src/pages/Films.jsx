@@ -31,7 +31,7 @@ export default function Films() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setSearch(input);
+      setSearch(input.trim() || "batman");
     }, 400);
 
     return () => clearTimeout(timeout);
@@ -56,10 +56,8 @@ export default function Films() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* NAVBAR */}
       <Navbar />
 
-      {/* FILTRES CENTRÉS */}
       <div className="flex justify-center mb-10">
         <div className="flex flex-wrap gap-4 bg-zinc-900 border border-zinc-800 rounded-2xl px-6 py-4">
           <select
@@ -101,7 +99,6 @@ export default function Films() {
         </div>
       </div>
 
-      {/* HERO */}
       <section className="mt-10 mb-16 text-center">
         <h2 className="text-3xl font-semibold mb-6 leading-relaxed max-w-3xl mx-auto">
           Regardez, chattez et profitez avec vos amis en temps réel même à
@@ -121,7 +118,6 @@ export default function Films() {
         </div>
       </section>
 
-      {/* FILMS */}
       <section className="px-20 pb-24">
         <h3 className="text-xl font-semibold mb-10">Films</h3>
 
@@ -136,7 +132,7 @@ export default function Films() {
           </div>
         )}
 
-        {!isLoading && !error && filteredFilms.length === 0 && (
+        {!isLoading && !error && data?.Search && filteredFilms.length === 0 && (
           <p className="text-zinc-400">Aucun film trouvé avec ces filtres.</p>
         )}
       </section>
