@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import { MovieRepository } from "../Infrastructure/Repository/MovieRepository";
+import { db } from "../Infrastructure/drizzle";
+import { categories, filmsCategories } from "../Infrastructure/schema";
+import { sql } from "drizzle-orm";
 
 interface OmdbSearchResult {
   Response: string;
@@ -14,6 +17,7 @@ interface OmdbDetail {
   Poster: string;
   Plot: string;
   Runtime: string;
+  Genre?: string;
 }
 
 const movieRepo = new MovieRepository();
@@ -64,7 +68,22 @@ export class MovieController {
         updated.push(movie);
       }
 
-      res.status(200).json(updated);
+      // Ajout des catégories à chaque film
+      const moviesWithCategories = await Promise.all(
+        updated.map(async (movie) => {
+          const filmCategories = await db
+            .select({ id: categories.id, name: categories.name })
+            .from(filmsCategories)
+            .innerJoin(
+              categories,
+              sql`${filmsCategories.categoryId} = ${categories.id}`,
+            )
+            .where(sql`${filmsCategories.filmId} = ${movie.id}`);
+          return { ...movie, categories: filmCategories };
+        }),
+      );
+
+      res.status(200).json(moviesWithCategories);
     } catch (error) {
       console.error("Error fetching movies:", error);
       res.status(500).json({ error: "Server error" });
@@ -81,7 +100,18 @@ export class MovieController {
       if (!movie) {
         return res.status(404).json({ error: "Film non trouvé" });
       }
-      res.status(200).json(movie);
+
+      // Ajout des catégories pour ce film
+      const filmCategories = await db
+        .select({ id: categories.id, name: categories.name })
+        .from(filmsCategories)
+        .innerJoin(
+          categories,
+          sql`${filmsCategories.categoryId} = ${categories.id}`,
+        )
+        .where(sql`${filmsCategories.filmId} = ${movie.id}`);
+
+      res.status(200).json({ ...movie, categories: filmCategories });
     } catch (error) {
       res.status(500).json({ error: "Erreur serveur" });
     }
@@ -130,9 +160,11 @@ export class MovieController {
         const detailRes = await fetch(
           `https://www.omdbapi.com/?apikey=${process.env.OMDB_API_KEY}&i=${item.imdbID}`,
         );
-        const detail = (await detailRes.json()) as OmdbDetail;
+        const detail = (await detailRes.json()) as OmdbDetail & {
+          Genre?: string;
+        };
 
-        await movieRepo.addMovie({
+        const newMovie = await movieRepo.addMovie({
           omdbId: detail.imdbID,
           title: detail.Title,
           year: parseInt(detail.Year) || null,
@@ -141,10 +173,49 @@ export class MovieController {
           plot: detail.Plot !== "N/A" ? detail.Plot : null,
           runtimeMinutes: parseInt(detail.Runtime) || null,
         });
+
+        if (detail.Genre && newMovie?.id) {
+          const genres = detail.Genre.split(",").map((g) => g.trim());
+          for (const genreName of genres) {
+            let [category] = await db
+              .select()
+              .from(categories)
+              .where(sql`LOWER(name) = LOWER(${genreName})`)
+              .limit(1);
+
+            if (!category) {
+              [category] = await db
+                .insert(categories)
+                .values({ name: genreName })
+                .returning();
+            }
+
+            await db
+              .insert(filmsCategories)
+              .values({ filmId: newMovie.id, categoryId: category.id })
+              .onConflictDoNothing();
+          }
+        }
       }
 
       const results = await movieRepo.searchByTitle(q);
-      res.status(200).json(results);
+
+      // Ajout des catégories à chaque film trouvé
+      const resultsWithCategories = await Promise.all(
+        results.map(async (movie) => {
+          const filmCategories = await db
+            .select({ id: categories.id, name: categories.name })
+            .from(filmsCategories)
+            .innerJoin(
+              categories,
+              sql`${filmsCategories.categoryId} = ${categories.id}`,
+            )
+            .where(sql`${filmsCategories.filmId} = ${movie.id}`);
+          return { ...movie, categories: filmCategories };
+        }),
+      );
+
+      res.status(200).json(resultsWithCategories);
     } catch (error) {
       console.error("Error searching movies:", error);
       res.status(500).json({ error: "Erreur serveur" });

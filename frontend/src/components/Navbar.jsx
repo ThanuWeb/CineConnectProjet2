@@ -64,62 +64,22 @@ const Navbar = () => {
       <div className="flex items-center justify-between">
         <span className="font-bold text-xl">CineConnect</span>
 
-        <div className="hidden md:block relative" ref={dropdownRef}>
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <input
-              type="text"
-              placeholder="Rechercher un film..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => suggestions.length > 0 && setShowDropdown(true)}
-              className="px-3 py-1 rounded-lg border border-gray-500 text-black w-64"
-            />
-            <button
-              type="submit"
-              className="bg-white text-black px-3 py-1 rounded-lg font-semibold"
-            >
-              Rechercher
-            </button>
-          </form>
-
-          {showDropdown && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 mt-1 w-80 bg-white rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
-              {suggestions.map((movie) => (
-                <div
-                  key={movie.id}
-                  onClick={() => handleSelectMovie(movie)}
-                  className="flex items-center gap-3 p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100"
-                >
-                  {movie.posterUrl ? (
-                    <img
-                      src={movie.posterUrl}
-                      alt={movie.title}
-                      className="w-10 h-14 object-cover rounded"
-                    />
-                  ) : (
-                    <div className="w-10 h-14 bg-gray-300 rounded" />
-                  )}
-                  <div>
-                    <p className="text-black text-sm font-medium">
-                      {movie.title}
-                    </p>
-                    {movie.year && (
-                      <p className="text-gray-500 text-xs">{movie.year}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
         <ul className="hidden md:flex list-none gap-8 text-white">
           <Link to="/film">
-            <li>Films-Series</li>
+            <li>Films</li>
           </Link>
-          <li className="cursor-pointer">Documentaires</li>
-          <li className="cursor-pointer">FAQ</li>
-          <li className="cursor-pointer">Aides</li>
+          <Link to="/discussion">
+            <li>Discussions</li>
+          </Link>
+          <Link to="/users">
+            <li>Utilisateur</li>
+          </Link>
+          <Link to="/faq">
+            <li>FAQ</li>
+          </Link>
+          <Link to="/help">
+            <li>Aides</li>
+          </Link>
         </ul>
 
         <div className="hidden md:flex gap-2">
@@ -158,11 +118,19 @@ const Navbar = () => {
         </div>
         <ul className="flex flex-col gap-6 p-6">
           <Link to="/film">
-            <li className="hover:text-gray-300 cursor-pointer">Films-Series</li>
+            <li className="hover:text-gray-300 cursor-pointer">Films</li>
           </Link>
-          <li className="hover:text-gray-300 cursor-pointer">Documentaires</li>
-          <li className="hover:text-gray-300 cursor-pointer">FAQ</li>
-          <li className="hover:text-gray-300 cursor-pointer">Aides</li>
+          <Link to="/documentaries">
+            <li className="hover:text-gray-300 cursor-pointer">
+              Documentaires
+            </li>
+          </Link>
+          <Link to="/faq">
+            <li className="hover:text-gray-300 cursor-pointer">FAQ</li>
+          </Link>
+          <Link to="/help">
+            <li className="hover:text-gray-300 cursor-pointer">Aides</li>
+          </Link>
         </ul>
         <div className="flex flex-col gap-3 p-6">
           <Link to="/login">

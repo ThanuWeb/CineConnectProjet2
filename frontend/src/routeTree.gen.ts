@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as HelpRouteImport } from './routes/help'
 import { Route as FilmRouteImport } from './routes/film'
 import { Route as DiscussionRouteImport } from './routes/discussion'
 import { Route as AboutRouteImport } from './routes/about'
@@ -25,6 +26,11 @@ const SignupRoute = SignupRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpRoute = HelpRouteImport.update({
+  id: '/help',
+  path: '/help',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FilmRoute = FilmRouteImport.update({
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/discussion': typeof DiscussionRoute
   '/film': typeof FilmRouteWithChildren
+  '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/film/$id': typeof FilmIdRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/discussion': typeof DiscussionRoute
   '/film': typeof FilmRouteWithChildren
+  '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/film/$id': typeof FilmIdRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/discussion': typeof DiscussionRoute
   '/film': typeof FilmRouteWithChildren
+  '/help': typeof HelpRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/film/$id': typeof FilmIdRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/discussion'
     | '/film'
+    | '/help'
     | '/login'
     | '/signup'
     | '/film/$id'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/discussion'
     | '/film'
+    | '/help'
     | '/login'
     | '/signup'
     | '/film/$id'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/discussion'
     | '/film'
+    | '/help'
     | '/login'
     | '/signup'
     | '/film/$id'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   DiscussionRoute: typeof DiscussionRoute
   FilmRoute: typeof FilmRouteWithChildren
+  HelpRoute: typeof HelpRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
 }
@@ -134,6 +147,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help': {
+      id: '/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof HelpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/film': {
@@ -189,6 +209,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   DiscussionRoute: DiscussionRoute,
   FilmRoute: FilmRouteWithChildren,
+  HelpRoute: HelpRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
 }

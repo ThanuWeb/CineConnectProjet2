@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useFilms, useSearchFilms } from "../hooks/useFilms";
+import { useCategories } from "../hooks/useCategories";
 import FilmCard from "../components/FilmCard";
 import SearchBar from "../components/SearchBar";
+import Navbar from "../components/Navbar";
 
 export default function Films() {
   const [input, setInput] = useState("");
@@ -24,6 +26,9 @@ export default function Films() {
   const isLoading = isSearching ? loadingSearch : loadingAll;
   const error = isSearching ? errorSearch : errorAll;
 
+  const { data: allCategories, isLoading: loadingCategories } = useCategories();
+  const [selectedCategory, setSelectedCategory] = useState("");
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setSearch(input.trim() || "batman");
@@ -40,65 +45,32 @@ export default function Films() {
       const directorMatch = director
         ? film.director?.toLowerCase().includes(director.toLowerCase())
         : true;
-      return yearMatch && directorMatch;
+      const categoryMatch = selectedCategory
+        ? film.categories?.some(
+            (cat) => cat.name?.toLowerCase() === selectedCategory.toLowerCase(),
+          )
+        : true;
+      return yearMatch && directorMatch && categoryMatch;
     });
-  }, [data, year, director]);
+  }, [data, year, director, selectedCategory]);
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <nav className="flex justify-between items-center px-20 py-6">
-        <h1 className="text-2xl font-bold">cineconnect</h1>
-
-        <div className="flex gap-10 text-zinc-300 items-center">
-          <span>Séries</span>
-          <span className="text-white">Films</span>
-          <span>Documentaires</span>
-          <span>FAQ</span>
-          <span>Aide</span>
-
-          <Link to="/discussion" className="hover:text-white transition">
-            Discussion
-          </Link>
-
-          <Link to="/users" className="hover:text-white transition">
-            Utilisateurs
-          </Link>
-        </div>
-
-        <div className="flex gap-3">
-          <Link to="/login">
-            <button className="bg-zinc-800 px-4 py-2 rounded">
-              S’identifier
-            </button>
-          </Link>
-          <Link to="/signup">
-            <button className="bg-white text-black px-4 py-2 rounded">
-              S’inscrire
-            </button>
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
       <div className="flex justify-center mb-10">
         <div className="flex flex-wrap gap-4 bg-zinc-900 border border-zinc-800 rounded-2xl px-6 py-4">
           <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
             className="bg-zinc-800 text-white px-3 py-2 rounded border border-zinc-600"
           >
             <option value="">Catégorie</option>
-            <option value="Action">Action</option>
-            <option value="Drama">Drame</option>
-            <option value="Sci-Fi">Science-fiction</option>
-            <option value="Comedy">Comédie</option>
-            <option value="Adventure">Aventure</option>
-            <option value="Fantasy">Fantastique</option>
-            <option value="Crime">Crime</option>
-            <option value="Thriller">Thriller</option>
-            <option value="Horror">Horreur</option>
-            <option value="Romance">Romance</option>
-            <option value="Animation">Animation</option>
-            <option value="Mystery">Mystère</option>
+            {allCategories?.map((cat) => (
+              <option key={cat.id} value={cat.name}>
+                {cat.name}
+              </option>
+            ))}
           </select>
 
           <input
