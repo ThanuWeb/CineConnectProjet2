@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { useFilms, useSearchFilms } from "../hooks/useFilms";
 import { useCategories } from "../hooks/useCategories";
 import FilmCard from "../components/FilmCard";
@@ -30,8 +29,9 @@ export default function Films() {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   useEffect(() => {
+    console.log("=============");
     const timeout = setTimeout(() => {
-      setSearch(input.trim() || "batman");
+      setSearch(input.trim());
     }, 400);
 
     return () => clearTimeout(timeout);
