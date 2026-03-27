@@ -101,29 +101,16 @@ export default function Films() {
             <option value="Mystery">Mystère</option>
           </select>
 
-          <input
-            type="number"
-            placeholder="Année"
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            className="bg-zinc-800 text-white px-3 py-2 rounded border border-zinc-600 w-24"
+          <input type="number"  placeholder="Année"  value={year}  onChange={(e) => setYear(e.target.value)}  className="bg-zinc-800 text-white px-3 py-2 rounded border border-zinc-600 w-24"
+           />
+
+          <input type="number" placeholder="Note" value={minRating} onChange={(e) => setMinRating(e.target.value)}   className="bg-zinc-800 text-white px-3 py-2 rounded border border-zinc-600 w-20"
+            
           />
 
-          <input
-            type="number"
-            placeholder="Note"
-            value={minRating}
-            onChange={(e) => setMinRating(e.target.value)}
-            className="bg-zinc-800 text-white px-3 py-2 rounded border border-zinc-600 w-20"
-          />
-
-          <input
-            type="text"
-            placeholder="Réalisateur"
-            value={director}
-            onChange={(e) => setDirector(e.target.value)}
-            className="bg-zinc-800 text-white px-3 py-2 rounded border border-zinc-600 w-32"
-          />
+          <input  type="text" placeholder="Réalisateur"  value={director}  onChange={(e) => setDirector(e.target.value)}   className="bg-zinc-800 text-white px-3 py-2 rounded border border-zinc-600 w-32"
+            
+         />
         </div>
       </div>
 

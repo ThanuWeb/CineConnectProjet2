@@ -80,17 +80,14 @@ export default function Users() {
                   <p className="text-zinc-400 mt-2">{user.bio}</p>
 
                   <div className="flex gap-3 mt-5">
-                    <Link
-                      to="/profil"
-                      className="bg-white text-black px-4 py-2 rounded-lg font-medium hover:opacity-90 transition"
-                    >
+                    <Link to="/profil" className="bg-white text-black px-4 py-2 rounded-lg font-medium hover:opacity-90 transition"
+                     >
                       Voir profil
                     </Link>
 
-                    <Link
-                      to="/discussion"
-                      className="bg-zinc-800 text-white px-4 py-2 rounded-lg hover:bg-zinc-700 transition"
-                    >
+                    <Link  to="/discussion"   className="bg-zinc-800 text-white px-4 py-2 rounded-lg hover:bg-zinc-700 transition"
+                      
+                     >
                       Discuter
                     </Link>
                   </div>
