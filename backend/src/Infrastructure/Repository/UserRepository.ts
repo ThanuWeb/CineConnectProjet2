@@ -36,7 +36,9 @@ export class UserRepository {
 
   async updateUser(
     id: string,
-    updates: Partial<Pick<User, "username" | "bio" | "avatarUrl">>,
+    updates: Partial<
+      Pick<User, "username" | "bio" | "avatarUrl" | "preferences">
+    >,
   ): Promise<User | null> {
     const [updated] = await db
       .update(users)

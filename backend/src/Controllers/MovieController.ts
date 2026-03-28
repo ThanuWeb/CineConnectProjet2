@@ -14,6 +14,8 @@ interface OmdbDetail {
   Poster: string;
   Plot: string;
   Runtime: string;
+  Actors: string;
+  imdbRating: string;
 }
 
 const movieRepo = new MovieRepository();
@@ -98,6 +100,8 @@ export class MovieController {
           posterUrl: detail.Poster !== "N/A" ? detail.Poster : null,
           plot: detail.Plot !== "N/A" ? detail.Plot : null,
           runtimeMinutes: parseInt(detail.Runtime) || null,
+          actors: detail.Actors !== "N/A" ? detail.Actors : null,
+          imdbRating: detail.imdbRating !== "N/A" ? detail.imdbRating : null,
         });
       }
 

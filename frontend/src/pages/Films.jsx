@@ -100,17 +100,6 @@ export default function Films() {
       </div>
 
       <section className="mt-10 mb-16 text-center">
-        <h2 className="text-3xl font-semibold mb-6 leading-relaxed max-w-3xl mx-auto">
-          Regardez, chattez et profitez avec vos amis en temps réel même à
-          distance
-          <br />
-          temps réel même à distance
-        </h2>
-
-        <p className="text-zinc-400 mb-10 max-w-md mx-auto">
-          Profitez de nouvelles offres et restez informé des nouveautés
-        </p>
-
         <div className="flex justify-center">
           <div className="w-full max-w-xl">
             <SearchBar value={input} onChange={setInput} />

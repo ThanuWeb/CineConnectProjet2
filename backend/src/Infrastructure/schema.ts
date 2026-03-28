@@ -20,6 +20,7 @@ export const users = pgTable("users", {
   passwordHash: text("password_hash").notNull(),
   avatarUrl: text("avatar_url"),
   bio: text("bio"),
+  preferences: text("preferences"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -36,6 +37,8 @@ export const films = pgTable(
     posterUrl: text("poster_url"),
     plot: text("plot"),
     runtimeMinutes: integer("runtime_minutes"),
+    actors: text("actors"),
+    imdbRating: varchar("imdb_rating", { length: 10 }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
@@ -119,3 +122,24 @@ export const messages = pgTable("messages", {
   sentAt: timestamp("sent_at").defaultNow().notNull(),
   isRead: boolean("is_read").default(false).notNull(),
 });
+
+// Table favorites
+export const favorites = pgTable(
+  "favorites",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    filmId: uuid("film_id")
+      .notNull()
+      .references(() => films.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    uniqueUserFilm: uniqueIndex("uq_favorite_user_film").on(
+      table.userId,
+      table.filmId,
+    ),
+  }),
+);

@@ -23,7 +23,7 @@ const Login = () => {
         body: JSON.stringify({ email: emailValue, password: pwdValue }),
       });
       setTokens(data.accessToken, data.refreshToken);
-      navigate({ to: "/film" });
+      navigate({ to: "/films" });
     } catch (err) {
       setMessage(err.message);
     }

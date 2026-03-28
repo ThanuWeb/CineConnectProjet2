@@ -6,6 +6,8 @@ import { CategoryController } from "../Controllers/CategoryController";
 import { ReviewController } from "../Controllers/ReviewController";
 import { FriendController } from "../Controllers/FriendController";
 import { MessageController } from "../Controllers/MessageController";
+import { FavoriteRepository } from "../Infrastructure/Repository/FavoriteRepository";
+import { FavoriteController } from "../Controllers/FavoriteController";
 
 const router = Router();
 
@@ -39,6 +41,7 @@ router.get("/movies/:id/reviews", ReviewController.getReviewsByFilm);
 router.post("/movies/:id/reviews", authenticateJWT, ReviewController.addReview);
 router.put("/reviews/:id", authenticateJWT, ReviewController.updateReview);
 router.delete("/reviews/:id", authenticateJWT, ReviewController.deleteReview);
+router.patch("/reviews/:id", authenticateJWT, ReviewController.updateReview);
 
 router.post("/friends/request", authenticateJWT, FriendController.sendRequest);
 router.put(
@@ -68,6 +71,20 @@ router.get(
 router.put("/messages/:id/read", authenticateJWT, MessageController.markAsRead);
 
 router.get("/users", authenticateJWT, AuthController.getAllUsers);
+router.get("/users/:id", authenticateJWT, AuthController.getUserById);
+router.get("/users/:id/stats", authenticateJWT, AuthController.getUserStats);
+
+router.post("/favorites", authenticateJWT, FavoriteController.addFavorite);
+router.delete(
+  "/favorites/:filmId",
+  authenticateJWT,
+  FavoriteController.removeFavorite,
+);
+router.get(
+  "/favorites/:filmId",
+  authenticateJWT,
+  FavoriteController.isFavorite,
+);
 
 router.get("/me", authenticateJWT, AuthController.getMe);
 router.put("/me", authenticateJWT, AuthController.updateMe);

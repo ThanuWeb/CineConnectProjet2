@@ -1,12 +1,12 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import FilmDetail from "../pages/FilmDetail";
+import Users from "../pages/Users";
 import { getToken } from "../api";
 
-export const Route = createFileRoute("/film/$id")({
+export const Route = createFileRoute("/users")({
   beforeLoad: () => {
     if (!getToken()) {
       throw redirect({ to: "/login" });
     }
   },
-  component: FilmDetail,
+  component: Users,
 });
