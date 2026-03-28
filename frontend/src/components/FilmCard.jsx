@@ -23,10 +23,10 @@ export default function FilmCard({ film }) {
     >
       <div className="group relative cursor-pointer">
         <img
-          src={film.posterUrl || "https://via.placeholder.com/300x450"}
+          src={film.posterUrl}
           alt={film.title}
           className="
-            w-[180px]
+            w-full
             aspect-[2/3]
             object-cover
             rounded-md
@@ -35,18 +35,53 @@ export default function FilmCard({ film }) {
             group-hover:scale-105
             group-hover:shadow-2xl
           "
+          onError={(e) => {
+            e.target.style.display = "none";
+            const fallback = e.target.parentNode.querySelector(".no-poster");
+            if (fallback) fallback.style.display = "flex";
+          }}
         />
+        <div
+          className="
+            w-full
+            aspect-[2/3]
+            flex
+            items-center
+            justify-center
+            bg-zinc-800
+            text-zinc-400
+            rounded-md
+            text-center
+            text-sm
+            font-semibold
+            no-poster
+          "
+          style={{ minHeight: "0", display: "none" }}
+        >
+          Pas de poster
+        </div>
 
         <div
           className="
-            absolute bottom-0 left-0 right-0
-            bg-gradient-to-t from-black via-black/70 to-transparent
-            p-3 opacity-0 group-hover:opacity-100 transition
-          "
+              absolute bottom-0 left-0 right-0
+              bg-gradient-to-t from-black via-black/70 to-transparent
+              p-3 opacity-0 group-hover:opacity-100 transition
+            "
         >
           <p className="text-sm font-medium">{film.title}</p>
           <p className="text-xs text-zinc-400">{film.year}</p>
         </div>
+      </div>
+
+      <div
+        className="
+            absolute bottom-0 left-0 right-0
+            bg-gradient-to-t from-black via-black/70 to-transparent
+            p-3 opacity-0 group-hover:opacity-100 transition
+          "
+      >
+        <p className="text-sm font-medium">{film.title}</p>
+        <p className="text-xs text-zinc-400">{film.year}</p>
       </div>
     </Link>
   );

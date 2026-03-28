@@ -2,6 +2,9 @@ import { UserRepository } from "../Infrastructure/Repository/UserRepository";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
+import { ReviewRepository } from "../Infrastructure/Repository/ReviewRepository";
+import { FriendRepository } from "../Infrastructure/Repository/FriendRepository";
+import { FavoriteRepository } from "../Infrastructure/Repository/FavoriteRepository";
 
 export class AuthController {
   static async signup(req: Request, res: Response) {
@@ -22,6 +25,7 @@ export class AuthController {
         passwordHash,
         avatarUrl: null,
         bio: null,
+        preferences: null,
       });
       res
         .status(201)
@@ -129,17 +133,54 @@ export class AuthController {
   static async updateMe(req: Request, res: Response) {
     try {
       const userId = (req as any).user.userId;
-      const { username, bio, avatarUrl } = req.body;
+      const { username, bio, avatarUrl, preferences } = req.body;
       const userRepo = new UserRepository();
       const updated = await userRepo.updateUser(userId, {
         username,
         bio,
         avatarUrl,
+        preferences,
       });
       if (!updated)
         return res.status(404).json({ error: "Utilisateur non trouvé" });
       const { passwordHash, ...safeUser } = updated;
       res.status(200).json(safeUser);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  }
+
+  static async getUserById(req: Request, res: Response) {
+    try {
+      const userId = req.params.id as string;
+      const userRepo = new UserRepository();
+      const user = await userRepo.getUserById(userId);
+      if (!user)
+        return res.status(404).json({ error: "Utilisateur non trouvé" });
+      const { passwordHash, ...safeUser } = user;
+      res.status(200).json(safeUser);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  }
+
+  static async getUserStats(req: Request, res: Response) {
+    try {
+      const userId = req.params.id as string;
+      const userRepo = new UserRepository();
+      const reviewRepo = new ReviewRepository();
+      const friendRepo = new FriendRepository();
+      const favoriteRepo = new FavoriteRepository();
+
+      const favoritesCount = await favoriteRepo.countFavoritesByUser(userId);
+      const reviewsCount = await reviewRepo.countReviewsByUser(userId);
+      const friendsCount = await friendRepo.countAcceptedFriends(userId);
+
+      res.status(200).json({
+        favorites: favoritesCount,
+        reviews: reviewsCount,
+        friends: friendsCount,
+      });
     } catch (error) {
       res.status(500).json({ error: "Erreur serveur" });
     }

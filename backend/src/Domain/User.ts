@@ -5,6 +5,7 @@ export type User = {
   passwordHash: string;
   avatarUrl: string | null;
   bio: string | null;
+  preferences: string | null;
   createdAt: Date;
   updatedAt: Date;
 };

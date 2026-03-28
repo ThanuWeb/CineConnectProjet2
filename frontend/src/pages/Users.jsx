@@ -1,47 +1,22 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-
-const fakeUsers = [
-  {
-    id: 1,
-    username: "Alice",
-    bio: "Passionnée de thrillers et de science-fiction.",
-    avatar: "A",
-  },
-  {
-    id: 2,
-    username: "Karim",
-    bio: "Fan de films d’action et de super-héros.",
-    avatar: "K",
-  },
-  {
-    id: 3,
-    username: "Sarah",
-    bio: "J’adore les drames et les films romantiques.",
-    avatar: "S",
-  },
-  {
-    id: 4,
-    username: "NolanFan",
-    bio: "Christopher Nolan est mon réalisateur préféré.",
-    avatar: "N",
-  },
-];
+import { useUsers } from "../hooks/useUsers";
 
 export default function Users() {
+  const { data: users = [], isLoading } = useUsers();
   const [search, setSearch] = useState("");
 
   const filteredUsers = useMemo(() => {
-    return fakeUsers.filter((user) =>
-      user.username.toLowerCase().includes(search.toLowerCase())
+    return users.filter((user) =>
+      user.username.toLowerCase().includes(search.toLowerCase()),
     );
-  }, [search]);
+  }, [search, users]);
 
   return (
     <div className="min-h-screen bg-black text-white px-10 py-8">
       <div className="max-w-6xl mx-auto">
         <Link
-          to="/"
+          to="/films"
           className="inline-block mb-6 px-4 py-2 bg-zinc-800 text-white rounded hover:bg-zinc-700 transition"
         >
           ← Retour aux films
@@ -81,7 +56,7 @@ export default function Users() {
 
                   <div className="flex gap-3 mt-5">
                     <Link
-                      to="/profil"
+                      to={`/profile/${user.id}`}
                       className="bg-white text-black px-4 py-2 rounded-lg font-medium hover:opacity-90 transition"
                     >
                       Voir profil

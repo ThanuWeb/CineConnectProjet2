@@ -1,12 +1,12 @@
 import { Link, useParams } from "@tanstack/react-router";
-import { useFilms } from "../hooks/useFilms";
+import { useFilm } from "../hooks/useFilms";
 import FavoriteButton from "../components/FavoriteButton";
 import RatingStars from "../components/RatingStars";
 import CommentsSection from "../components/CommentsSection";
 
 export default function FilmDetail() {
   const { id } = useParams({ from: "/film/$id" });
-  const { data, isLoading, error } = useFilms(id);
+  const { data, isLoading, error } = useFilm(id);
 
   console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZ");
   if (isLoading) {
@@ -38,7 +38,7 @@ export default function FilmDetail() {
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
           <Link
-            to="/"
+            to="/films"
             className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-800 text-zinc-300 text-sm hover:bg-zinc-700 transition"
           >
             ← Retour
@@ -90,17 +90,12 @@ export default function FilmDetail() {
               </div>
 
               <div className="flex flex-col gap-6">
-                <FavoriteButton imdbID={data.imdbID} />
-
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">Votre note</h3>
-                  <RatingStars imdbID={data.imdbID} />
-                </div>
+                <FavoriteButton filmId={data.id} />
               </div>
             </div>
           </div>
 
-          <CommentsSection imdbID={data.imdbID} />
+          <CommentsSection filmId={data.id} />
         </div>
       </div>
     </div>

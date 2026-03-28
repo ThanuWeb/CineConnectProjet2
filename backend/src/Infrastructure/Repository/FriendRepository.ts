@@ -54,4 +54,17 @@ export class FriendRepository {
   async deleteFriend(id: string): Promise<void> {
     await db.delete(friends).where(eq(friends.id, id));
   }
+
+  async countAcceptedFriends(userId: string): Promise<number> {
+    const result = await db
+      .select()
+      .from(friends)
+      .where(
+        and(
+          or(eq(friends.requesterId, userId), eq(friends.addresseeId, userId)),
+          eq(friends.status, "accepted"),
+        ),
+      );
+    return result.length;
+  }
 }

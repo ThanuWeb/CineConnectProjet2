@@ -1,11 +1,25 @@
 import { eq, and } from "drizzle-orm";
 import { Review } from "../../Domain/Review";
 import { db } from "../drizzle";
-import { reviews } from "../schema";
+import { reviews, users } from "../schema";
 
 export class ReviewRepository {
-  async getReviewsByFilmId(filmId: string): Promise<Review[]> {
-    return await db.select().from(reviews).where(eq(reviews.filmId, filmId));
+  async getReviewsByFilmId(filmId: string): Promise<any[]> {
+    return await db
+      .select({
+        id: reviews.id,
+        userId: reviews.userId,
+        filmId: reviews.filmId,
+        rating: reviews.rating,
+        comment: reviews.comment,
+        createdAt: reviews.createdAt,
+        updatedAt: reviews.updatedAt,
+        username: users.username,
+        avatarUrl: users.avatarUrl,
+      })
+      .from(reviews)
+      .leftJoin(users, eq(reviews.userId, users.id))
+      .where(eq(reviews.filmId, filmId));
   }
 
   async getReviewByUserAndFilm(
@@ -50,5 +64,13 @@ export class ReviewRepository {
       .where(eq(reviews.id, id))
       .limit(1);
     return result.length > 0 ? result[0] : null;
+  }
+
+  async countReviewsByUser(userId: string): Promise<number> {
+    const result = await db
+      .select()
+      .from(reviews)
+      .where(eq(reviews.userId, userId));
+    return result.length;
   }
 }
