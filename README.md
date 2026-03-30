@@ -5,10 +5,11 @@ Membre du groupe :
 Tanushan, Bérenice, Thomas
 
 repo : https://github.com/ThanuWeb/CineConnectProjet2
+figma : https://www.figma.com/design/JzujYCcrqw187VmbzFg1h1/cineconnect--Copy-?node-id=0-1&t=V5UJXc9wmFop6vVj-1
 
 ## 📌 Vue d'ensemble
 
-**CineConnect** est une application web permettant aux utilisateurs de regarder, discuter et profiter de films/séries avec leurs amis en temps réel, même à distance.
+**CineConnect** est une application web permettant aux utilisateurs de discuter films/séries avec leurs amis en temps réel.
 
 **Stack technologique :**
 
@@ -32,44 +33,49 @@ Backend API pour le projet CineConnect, utilisant Node.js, Express, Drizzle ORM 
 - [Docker](https://www.docker.com/) et [Docker Compose](https://docs.docker.com/compose/)
 - (Optionnel) [psql](https://www.postgresql.org/download/) pour requêtes manuelles
 
+---
+
 ## Installation
 
 1. **Cloner le dépôt**
 
    ```bash
    git clone https://github.com/ThanuWeb/CineConnectProjet2.git
-   cd CineConnectProjet2/backend
-
    ```
 
-2. **Installer les dépendances**
+2. **Installer les dépendances frontend**
 
    ```bash
+   cd frontend
    pnpm install
    ```
 
-3. **Configurer les variables d'environnement**
-
-   Créez un fichier `.env` à la racine du dossier `backend` avec les variables suivantes :
-
-   ```env
-   # Pour le développement local
-   DATABASE_URL=postgresql://postgres:postgres@localhost:5434/db
-   PORT=3000
-   JWT_SECRET=dev-secret-super-long
-   FRONTEND_ORIGIN=http://localhost:5173
-   ```
-
-4. **Démarrer la base de données avec Docker**
+3. **Démarrer la base de données avec Docker et installer les dépendances backend**
 
    Assurez-vous que Docker est installé et en cours d'exécution, puis lancez la base de données PostgreSQL :
 
    ```bash
+   cd ../backend
    docker compose build --no-cache
    docker compose up -d
+   pnpm install
    ```
 
-5. **Gestion de la base de données**
+4. **Gestion de la base de données**
+
+   Il faut modifier temporairement les variables d'environnement pour la connexion à la base de données dans un fichier `.env` à la racine du dossier `backend` :
+
+   Passer la ligne suivante de `DATABASE_URL` :
+
+   ```
+   DATABASE_URL=postgresql://postgres:postgres@postgres:5432/db
+   ```
+
+   à
+
+   ```
+   DATABASE_URL=postgresql://postgres:postgres@localhost:5434/db
+   ```
 
    Utilisez Drizzle pour créer les tables dans PostgreSQL :
 
@@ -80,51 +86,14 @@ Backend API pour le projet CineConnect, utilisant Node.js, Express, Drizzle ORM 
    ```
 
    ```bash
-   pnpm run db:push
+   pnpm run db:migrate
    ```
 
-## ✅ Avancée du projet
+   Puis seed la base de données avec des données de test :
 
-### **Frontend** (React + Vite)
-
-| Feature                    | Statut       | Notes                                                 |
-| -------------------------- | ------------ | ----------------------------------------------------- |
-| **Architecture de base**   | ✅ Complète  | Vite configuré, Tailwind CSS intégré                  |
-| **Routing**                | ✅ Complète  | TanStack Router avec 5 routes générées                |
-| **Navbar**                 | ✅ En cours  | Composant créé, liens vers Films/Accueil fonctionnels |
-| **Pages existantes**       | ✅ Créées    | Index, About, Film, Login, Signin                     |
-| **Page d'accueil (Index)** | 🔄 En cours  | Hero section, newsletter, animations CSS              |
-| **Page Films**             | 🔄 En cours  | Intégration API OMDb (lectures de films)              |
-| **Authentification UI**    | ❌ À faire   | Pages Login/Signin à développer                       |
-| **Chat temps réel**        | ❌ À faire   | Intégration Socket.io                                 |
-| **Responsive design**      | 🟡 Partiel   | Base Tailwind en place, à affiner                     |
-| **ESLint**                 | ✅ Configuré | Avec support React Hooks                              |
-
-### **Backend** (Express + TypeScript)
-
-| Feature              | Statut       | Notes                              |
-| -------------------- | ------------ | ---------------------------------- |
-| **Serveur Express**  | ✅ Configuré | Port configuré, CORS activé        |
-| **TypeScript**       | ✅ Configuré | tsconfig en place                  |
-| **Base de données**  | 🔄 En cours  | Drizzle ORM + PostgreSQL           |
-| **Migrations BD**    | ❌ À faire   | Utiliser `drizzle-kit migrate`     |
-| **Routes API**       | ❌ À faire   | CRUD utilisateurs, films, etc.     |
-| **Authentification** | ❌ À faire   | Better Auth intégré (v1.4.18)      |
-| **JWT**              | ❌ À faire   | jsonwebtoken installé              |
-| **Socket.io**        | ❌ À faire   | Pour le chat temps réel            |
-| **Swagger/Docs API** | ❌ À faire   | swagger-jsdoc + swagger-ui-express |
-| **Testing**          | ❌ À faire   | Vitest configuré, tests à écrire   |
-| **Validation**       | ❌ À faire   | Pour validation des données        |
-
-### **Base de données**
-
-| Feature            | Statut     | Notes                                        |
-| ------------------ | ---------- | -------------------------------------------- |
-| **Schema Drizzle** | ❌ À faire | Créer les tables (users, films, chats, etc.) |
-| **Seed data**      | ❌ À faire | Script `db:seed` à implémenter               |
-| **Migrations**     | ❌ À faire | Utiliser drizzle-kit                         |
-
----
+   ```bash
+   pnpm run db:seed
+   ```
 
 ## 🚀 Commandes disponibles
 
@@ -136,6 +105,8 @@ pnpm dev          # Développement (Vite HMR)
 pnpm build        # Build production
 pnpm lint         # ESLint check
 pnpm preview      # Prévisualiser le build
+pnpm test         # Tests Vitest
+pnpm test:coverage  # Tests avec couverture
 ```
 
 ### **Backend**
@@ -145,6 +116,7 @@ cd backend
 pnpm dev          # Développement (tsx watch)
 pnpm build        # Build TypeScript
 pnpm test         # Tests Vitest
+pnpm test:coverage  # Tests avec couverture
 pnpm db:push      # Pousser le schema à la DB
 pnpm db:migrate   # Migrations
 pnpm db:studio    # Ouvrir le studio Drizzle
@@ -156,57 +128,68 @@ pnpm db:studio    # Ouvrir le studio Drizzle
 
 ```
 CineConnectProjet2/
-├── frontend/                 # React + Vite
-│   ├── src/
-│   │   ├── routes/          # TanStack Router (index, about, film, login, signin)
-│   │   ├── pages/           # Composants pages
-│   │   ├── components/      # Composants réutilisables (Navbar)
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── vite.config.js       # Configuration Vite + TanStack Router Plugin
-│   ├── tailwind.config.js   # Tailwind CSS
-│   └── package.json
+├── frontend/ # React + Vite
+│ ├── src/
+│ │ ├── api/ # Modules API (comments, favorites, films, ratings)
+│ │ ├── api.js # Client API centralisé (fetch, tokens, refresh)
+│ │ ├── components/ # Composants réutilisables
+│ │ │ ├── discussion/ # Composants chat (ChatArea, FriendsSideBar, modals)
+│ │ │ ├── Navbar.jsx
+│ │ │ ├── Footer.jsx
+│ │ │ ├── FilmCard.jsx
+│ │ │ ├── CommentsSection.jsx
+│ │ │ ├── FavoriteButton.jsx
+│ │ │ ├── RatingStars.jsx
+│ │ │ ├── SearchBar.jsx
+│ │ │ ├── EditProfileModal.jsx
+│ │ │ └── EditPreferencesModal.jsx
+│ │ ├── hooks/ # React Query hooks (useFilms, useReviews, useUser, etc.)
+│ │ ├── mock/ # Données mock (currentUser)
+│ │ ├── pages/ # Composants pages (Films, FilmDetail, Profile, Discussion, etc.)
+│ │ ├── routes/ # TanStack Router file-based routes
+│ │ ├── assets/ # Icônes et images
+│ │ ├── tests/ # Tests unitaires frontend
+│ │ ├── main.jsx # Point d'entrée React
+│ │ └── index.css # Styles globaux (Tailwind)
+│ ├── vite.config.js # Configuration Vite + TanStack Router Plugin
+│ ├── tailwind.config.js # Tailwind CSS
+│ ├── jest.config.cjs # Configuration des tests
+│ └── package.json
 │
-├── backend/                 # Express + TypeScript
-│   ├── src/
-│   │   ├── app.ts           # Configuration Express
-│   │   ├── server.ts        # Point d'entrée
-│   │   ├── routes/          # Routes API (à créer)
-│   │   ├── db/              # Drizzle ORM
-│   │   ├── config/          # Configuration
-│   │   └── middleware/      # Middlewares (CORS, Auth, etc.)
-│   ├── drizzle/             # Migrations
-│   ├── drizzle.config.ts    # Configuration Drizzle
-│   ├── tsconfig.json
-│   └── package.json
+├── backend/ # Express + TypeScript
+│ ├── src/
+│ │ ├── app.ts # Configuration Express (middlewares, CORS)
+│ │ ├── server.ts # Point d'entrée serveur
+│ │ ├── websocket.ts # Configuration Socket.io
+│ │ ├── routes/ # Définition des routes API
+│ │ │ └── router.ts
+│ │ ├── Controllers/ # Logique des endpoints
+│ │ │ ├── AuthController.ts
+│ │ │ ├── MovieController.ts
+│ │ │ ├── ReviewController.ts
+│ │ │ ├── FriendController.ts
+│ │ │ ├── MessageController.ts
+│ │ │ ├── CategoryController.ts
+│ │ │ └── FavoriteController.ts
+│ │ ├── Domain/ # Types métier (User, Movie, Review, Friend, etc.)
+│ │ ├── Infrastructure/ # Couche données
+│ │ │ ├── schema.ts # Schéma Drizzle (tables)
+│ │ │ ├── drizzle.ts # Connexion DB
+│ │ │ ├── seed.ts # Seed des données initiales
+│ │ │ └── Repository/ # Repositories (User, Movie, Review, Friend, etc.)
+│ │ ├── config/ # Configuration (env, swagger)
+│ │ ├── middleware/ # Middlewares (JWT auth)
+│ │ └── tests/ # Tests unitaires backend
+│ ├── drizzle/ # Migrations SQL
+│ ├── docker-compose.yml # PostgreSQL via Docker
+│ ├── Dockerfile
+│ ├── drizzle.config.ts # Configuration Drizzle
+│ ├── tsconfig.json
+│ └── package.json
 │
-├── shared/                  # Code partagé (si nécessaire)
-├── docs/                    # Documentation
-└── docker-compose.yml       # Docker setup
+├── docs/ # Documentation
+└── README.md
 ```
-
----
-
-## 🎯 Prochaines priorités
-
-### **Court terme (Critical)**
-
-1. ✋ **Finir la BD** : Créer le schema Drizzle (users, films, rooms, messages)
-2. 🔐 **Routes Auth** : Implémenter Better Auth avec les endpoints
-3. 📺 **Routes Films** : CRUD pour les films
-4. 🧪 **Tests** : Ajouter tests unitaires/intégration
-
-### **Moyen terme**
-
-5. 💬 **Socket.io Chat** : Intégrer le système de chat temps réel
-6. 🎬 **Streaming** : Intégration vidéo (si applicable)
-7. 🔔 **Notifs** : Système de notifications
-
-### **Long terme**
-
-8. 📱 **Mobile** : Responsive complète
-9. 🚀 **Déploiement** : Docker + CI/CD
-10. 📊 **Analytics** : Suivi utilisateurs
 
 ---
 

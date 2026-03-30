@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { db } from "./drizzle";
-import { films } from "./schema";
+import { films, categories, filmsCategories } from "./schema";
+import { eq } from "drizzle-orm";
 
 const seedFilms = [
   {
@@ -14,6 +15,7 @@ const seedFilms = [
     runtimeMinutes: 142,
     actors: "Tim Robbins, Morgan Freeman, Bob Gunton, William Sadler",
     imdbRating: "9.3",
+    categories: ["Drame"],
   },
   {
     omdbId: "tt0068646",
@@ -26,6 +28,7 @@ const seedFilms = [
     runtimeMinutes: 175,
     actors: "Marlon Brando, Al Pacino, James Caan, Diane Keaton",
     imdbRating: "9.2",
+    categories: ["Drame", "Crime"],
   },
   {
     omdbId: "tt0468569",
@@ -38,6 +41,7 @@ const seedFilms = [
     runtimeMinutes: 152,
     actors: "Christian Bale, Heath Ledger, Aaron Eckhart, Michael Caine",
     imdbRating: "9.0",
+    categories: ["Action", "Crime", "Drame"],
   },
   {
     omdbId: "tt0071562",
@@ -50,6 +54,7 @@ const seedFilms = [
     runtimeMinutes: 202,
     actors: "Al Pacino, Robert De Niro, Robert Duvall, Diane Keaton",
     imdbRating: "9.0",
+    categories: ["Drame", "Crime"],
   },
   {
     omdbId: "tt0050083",
@@ -62,6 +67,7 @@ const seedFilms = [
     runtimeMinutes: 96,
     actors: "Henry Fonda, Lee J. Cobb, Martin Balsam, John Fiedler",
     imdbRating: "9.0",
+    categories: ["Drame"],
   },
   {
     omdbId: "tt0108052",
@@ -74,6 +80,7 @@ const seedFilms = [
     runtimeMinutes: 195,
     actors: "Liam Neeson, Ben Kingsley, Ralph Fiennes, Caroline Goodall",
     imdbRating: "8.9",
+    categories: ["Drame", "Historique"],
   },
   {
     omdbId: "tt0167260",
@@ -86,6 +93,7 @@ const seedFilms = [
     runtimeMinutes: 201,
     actors: "Elijah Wood, Viggo Mortensen, Ian McKellen, Orlando Bloom",
     imdbRating: "8.9",
+    categories: ["Aventure", "Fantastique"],
   },
   {
     omdbId: "tt0110912",
@@ -98,6 +106,7 @@ const seedFilms = [
     runtimeMinutes: 154,
     actors: "John Travolta, Uma Thurman, Samuel L. Jackson, Bruce Willis",
     imdbRating: "8.9",
+    categories: ["Crime", "Drame"],
   },
   {
     omdbId: "tt0120737",
@@ -110,6 +119,7 @@ const seedFilms = [
     runtimeMinutes: 178,
     actors: "Elijah Wood, Ian McKellen, Orlando Bloom, Sean Astin",
     imdbRating: "8.8",
+    categories: ["Aventure", "Fantastique"],
   },
   {
     omdbId: "tt0137523",
@@ -122,6 +132,7 @@ const seedFilms = [
     runtimeMinutes: 139,
     actors: "Brad Pitt, Edward Norton, Meat Loaf, Zach Grenier",
     imdbRating: "8.8",
+    categories: ["Drame", "Thriller"],
   },
   {
     omdbId: "tt0109830",
@@ -134,6 +145,7 @@ const seedFilms = [
     runtimeMinutes: 142,
     actors: "Tom Hanks, Robin Wright, Gary Sinise, Sally Field",
     imdbRating: "8.8",
+    categories: ["Drame", "Comédie"],
   },
   {
     omdbId: "tt0133093",
@@ -146,6 +158,7 @@ const seedFilms = [
     runtimeMinutes: 136,
     actors: "Keanu Reeves, Laurence Fishburne, Carrie-Anne Moss, Hugo Weaving",
     imdbRating: "8.7",
+    categories: ["Action", "Science-Fiction"],
   },
   {
     omdbId: "tt0080684",
@@ -158,6 +171,7 @@ const seedFilms = [
     runtimeMinutes: 124,
     actors: "Mark Hamill, Harrison Ford, Carrie Fisher, Billy Dee Williams",
     imdbRating: "8.7",
+    categories: ["Action", "Aventure", "Science-Fiction"],
   },
   {
     omdbId: "tt1375666",
@@ -170,6 +184,7 @@ const seedFilms = [
     runtimeMinutes: 148,
     actors: "Leonardo DiCaprio, Joseph Gordon-Levitt, Ellen Page, Tom Hardy",
     imdbRating: "8.7",
+    categories: ["Action", "Science-Fiction", "Thriller"],
   },
   {
     omdbId: "tt0167261",
@@ -182,6 +197,7 @@ const seedFilms = [
     runtimeMinutes: 179,
     actors: "Elijah Wood, Ian McKellen, Viggo Mortensen, Orlando Bloom",
     imdbRating: "8.7",
+    categories: ["Aventure", "Fantastique"],
   },
   {
     omdbId: "tt0816692",
@@ -194,6 +210,7 @@ const seedFilms = [
     runtimeMinutes: 169,
     actors: "Matthew McConaughey, Anne Hathaway, Jessica Chastain, Bill Irwin",
     imdbRating: "8.6",
+    categories: ["Aventure", "Science-Fiction", "Drame"],
   },
   {
     omdbId: "tt0114369",
@@ -206,6 +223,7 @@ const seedFilms = [
     runtimeMinutes: 127,
     actors: "Morgan Freeman, Brad Pitt, Kevin Spacey, Andrew Kevin Walker",
     imdbRating: "8.6",
+    categories: ["Crime", "Thriller"],
   },
   {
     omdbId: "tt0245429",
@@ -218,6 +236,7 @@ const seedFilms = [
     runtimeMinutes: 125,
     actors: "Daveigh Chase, Suzanne Pleshette, Miyu Irino, Mari Natsuki",
     imdbRating: "8.6",
+    categories: ["Animation", "Aventure", "Fantastique"],
   },
   {
     omdbId: "tt0120689",
@@ -230,6 +249,7 @@ const seedFilms = [
     runtimeMinutes: 189,
     actors: "Tom Hanks, Michael Clarke Duncan, David Morse, Bonnie Hunt",
     imdbRating: "8.6",
+    categories: ["Drame", "Fantastique"],
   },
   {
     omdbId: "tt0482571",
@@ -242,17 +262,68 @@ const seedFilms = [
     runtimeMinutes: 130,
     actors: "Christian Bale, Hugh Jackman, Scarlett Johansson, Michael Caine",
     imdbRating: "8.5",
+    categories: ["Drame", "Thriller", "Science-Fiction"],
   },
 ];
 
+const seedCategories = [
+  { name: "Action", description: "Films d'action et de combats" },
+  { name: "Aventure", description: "Films d'aventure et d'exploration" },
+  { name: "Animation", description: "Films d'animation" },
+  { name: "Comédie", description: "Films comiques" },
+  { name: "Crime", description: "Films policiers et criminels" },
+  { name: "Drame", description: "Films dramatiques" },
+  { name: "Fantastique", description: "Films fantastiques et de fantasy" },
+  { name: "Historique", description: "Films historiques" },
+  { name: "Horreur", description: "Films d'horreur" },
+  { name: "Romance", description: "Films romantiques" },
+  { name: "Science-Fiction", description: "Films de science-fiction" },
+  { name: "Thriller", description: "Films à suspense" },
+];
+
 async function seed() {
-  console.log("Seeding films...");
-
-  for (const film of seedFilms) {
-    await db.insert(films).values(film).onConflictDoNothing();
+  // 1. Seed des catégories
+  console.log("Seeding categories...");
+  for (const cat of seedCategories) {
+    await db.insert(categories).values(cat).onConflictDoNothing();
   }
+  console.log(`${seedCategories.length} catégories insérées !`);
 
+  // 2. Seed des films
+  console.log("Seeding films...");
+  for (const film of seedFilms) {
+    const { categories: filmCats, ...filmData } = film;
+    await db.insert(films).values(filmData).onConflictDoNothing();
+  }
   console.log(`${seedFilms.length} films insérés !`);
+
+  // 3. Seed des associations films <-> catégories
+  console.log("Seeding films_categories...");
+  for (const film of seedFilms) {
+    // Récupérer le film par omdbId
+    const [dbFilm] = await db
+      .select()
+      .from(films)
+      .where(eq(films.omdbId, film.omdbId))
+      .limit(1);
+    if (!dbFilm) continue;
+
+    for (const catName of film.categories) {
+      const [dbCat] = await db
+        .select()
+        .from(categories)
+        .where(eq(categories.name, catName))
+        .limit(1);
+      if (!dbCat) continue;
+
+      await db
+        .insert(filmsCategories)
+        .values({ filmId: dbFilm.id, categoryId: dbCat.id })
+        .onConflictDoNothing();
+    }
+  }
+  console.log("Associations films/catégories insérées !");
+
   process.exit(0);
 }
 
