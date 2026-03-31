@@ -4,6 +4,7 @@ import { useCategories } from "../hooks/useCategories";
 import FilmCard from "../components/FilmCard";
 import SearchBar from "../components/SearchBar";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 export default function Films() {
   const [input, setInput] = useState("");
@@ -125,6 +126,7 @@ export default function Films() {
           <p className="text-zinc-400">Aucun film trouvé avec ces filtres.</p>
         )}
       </section>
+      <Footer />
     </div>
   );
 }
